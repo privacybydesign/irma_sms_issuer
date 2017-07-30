@@ -1,3 +1,51 @@
 <!DOCTYPE html>
 
-<h1>It works!</h1>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Telefoonnummer toevoegen</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta value="https://privacybydesign.foundation/tomcat/irma_api_server/server/" name="irma-web-server">
+        <meta value="https://privacybydesign.foundation/tomcat/irma_api_server/api/v2/" name="irma-api-server">
+
+        <link rel="stylesheet" href="https://privacybydesign.foundation/tomcat/irma_api_server/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+
+        <script src="https://privacybydesign.foundation/tomcat/irma_api_server/bower_components/jquery/dist/jquery.js" defer></script>
+        <script src="https://privacybydesign.foundation/tomcat/irma_api_server/client/irma.js" defer></script>
+        <script src="common.js" defer></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3">
+                    <h1>Telefoonnummer toevoegen</h1>
+
+                    <div id="status" class="alert hidden" role="alert"></div>
+
+                    <p>Hier kunt u een telefoonnummer als attribuut toevoegen
+                        aan uw IRMA app. Dit werkt als volgt:</p>
+                    <ol>
+                        <li>Vul uw telefoonnummer hieronder in, en klik op de
+                            knop 'Voeg toe'.</li>
+                        <li>Naar het telefoonnummer dat u opgeeft wordt een
+                            SMS met een verificatie-code gestuurt. Vul de
+                            code hier in.</li>
+                        <li>Scan de QR-code die verschijnt met uw IRMA-app.</li>
+                    </ol>
+                    <form id="phone-form">
+                        <div class="input-group">
+                            <input type="tel" required class="form-control"
+                                   placeholder="0612345678"
+                                   title="vul een Nederlands mobiel nummer in"
+                                   pattern=" *(0|0031|\+31)6[1-9][0-9]{7} *"/>
+                            <span class="input-group-btn">
+                                <input type="submit" class="btn btn-primary"
+                                       value="Voeg toe"/>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
