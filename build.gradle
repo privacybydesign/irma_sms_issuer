@@ -1,0 +1,36 @@
+group 'foundation.privacybydesign.sms'
+version '1.0'
+
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+
+sourceCompatibility = 1.7
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.org.akhikhl.gretty:gretty:1.4.2"
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url "https://credentials.github.io/repos/maven2/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.glassfish.jersey.core:jersey-server:2.25'
+    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.25'
+
+    compile 'org.irmacard.api:irma_api_common:0.7.7'
+    compile 'foundation.privacybydesign.common:irma_server_common:0.2'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

@@ -1,0 +1,9 @@
+{
+  "private_key_path": "sk.der",
+  "server_name": "irma_sms_issuer",
+  "human_readable_name": "Privacy by Design Foundation",
+  "scheme_manager": "pbdf",
+  "sms_issuer": "pbdf",
+  "sms_credential": "sms",
+  "sms_attribute": "sms"
+}
