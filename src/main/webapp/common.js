@@ -14,7 +14,7 @@ function onsubmit(e) {
             console.log('success', e);
         })
         .fail(function(e) {
-            console.error('fail', e);
+            console.error('fail', e.responseText);
         });
 }
 
