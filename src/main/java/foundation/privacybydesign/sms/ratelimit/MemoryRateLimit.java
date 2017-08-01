@@ -30,7 +30,7 @@ public class MemoryRateLimit extends RateLimit {
         return instance;
     }
 
-    protected synchronized boolean rateLimitedIP(String ip) {
+    protected synchronized long rateLimitedIP(String ip) {
         // Allow at most 1 try in each period (TIMEOUT), but kick in only
         // after 3 tries.
         long now = System.currentTimeMillis();
@@ -48,20 +48,17 @@ public class MemoryRateLimit extends RateLimit {
             // I don't want to wait 97 periods - just one. I haven't actually
             // used (much) resources those 97 periods or have removed a rogue
             // user from my network etc.
+            ipLimits.put(ip, Math.min(limit, now));
             if (limit > now) {
-                limit = now;
-            }
-            ipLimits.put(ip, limit);
-            if (limit >= now) {
                 // Rate limited!
-                logger.warn("Denying request from {}!", ip);
-                return true;
+                logger.warn("Denying request from {}: IP limit exceeded", ip);
+                return limit - now;
             }
         }
-        return false;
+        return 0;
     }
 
-    protected synchronized boolean rateLimitedPhone(String phone) {
+    protected synchronized long rateLimitedPhone(String ip, String phone) {
         // Rate limiter durations (sort-of logarithmic):
         // 1   10 second
         // 2   5 minute
@@ -83,7 +80,6 @@ public class MemoryRateLimit extends RateLimit {
             limit = new Limit();
             phoneLimits.put(phone, limit);
         }
-        System.out.println("current phone limit: " + limit.tries);
         long nextTry; // timestamp when the next request is allowed
         switch (limit.tries) {
             case 0: // try 1: always succeeds
@@ -108,8 +104,8 @@ public class MemoryRateLimit extends RateLimit {
             // Denying this request.
             // Don't count this request, as the user hasn't actually caused
             // any load on the system (yet).
-            System.out.println("Denied. Try again in: " + (nextTry-now)/1000);
-            return true;
+            logger.warn("Denying request from {}: phone number limit exceeded", ip);
+            return nextTry-now;
         }
         // Allowing this request, but counting the usage.
         limit.tries = Math.min(limit.tries+1, 5); // add 1, max at 5
@@ -117,8 +113,7 @@ public class MemoryRateLimit extends RateLimit {
         // extra tries this week. But don't go below 1 limit in the counter.
         limit.tries = (int)Math.max(1, limit.tries - (now-limit.timestamp)/WEEK);
         limit.timestamp = now;
-        System.out.println("Allowed. Now at tries: " + limit.tries);
-        return false;
+        return 0;
     }
 }
 

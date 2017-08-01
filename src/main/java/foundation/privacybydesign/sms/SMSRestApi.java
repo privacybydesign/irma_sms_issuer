@@ -40,11 +40,14 @@ public class SMSRestApi {
                     (ERR_ADDRESS_MALFORMED).build();
         }
 
-        if (rateLimiter.rateLimited(req.getRemoteAddr(), phone)) {
+        long retryAfter = rateLimiter.rateLimited(req.getRemoteAddr(), phone);
+        if (retryAfter > 0) {
             // 429 Too Many Requests
             // https://tools.ietf.org/html/rfc6585#section-4
-            // TODO: Retry-After header + indication in UI
-            return Response.status(429).entity(ERR_RATE_LIMITED).build();
+            return Response.status(429)
+                    .entity(ERR_RATE_LIMITED)
+                    .header("Retry-After", (int)Math.ceil(retryAfter/1000.0))
+                    .build();
         }
 
         System.out.println("phone number: " + phone);

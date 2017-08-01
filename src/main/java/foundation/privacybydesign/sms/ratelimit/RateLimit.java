@@ -8,18 +8,26 @@ import java.net.UnknownHostException;
  * for easier debugging and database for production).
  */
 public abstract class RateLimit {
-    public boolean rateLimited(String remoteAddr, String phone) {
+    /** Take an IP address and a phone number and rate limit them.
+     * @param remoteAddr IP address (IPv4 or IPv6 in any format)
+     * @param phone phone number
+     * @return the number of milliseconds that the client should wait - 0 if
+     *         it shouldn't wait.
+     */
+    public long rateLimited(String remoteAddr, String phone) {
         String addr = getAddressPrefix(remoteAddr);
-        System.out.println("checking " + addr);
         // Note: when the phone limit is reached, the IP limit is incremented
         // which might not be desired.
-        if (rateLimitedIP(addr)) {
-            return true;
+        long retryAfter = rateLimitedIP(addr);
+        if (retryAfter > 0) {
+            // TODO: also take into account the phone rate limit
+            return retryAfter;
         }
-        if (rateLimitedPhone(phone)) {
-            return true;
+        retryAfter = rateLimitedPhone(addr, phone);
+        if (retryAfter > 0) {
+            return retryAfter;
         }
-        return false;
+        return 0;
     }
 
     /** Insert an IP address (IPv4 or IPv6) and get a canonicalized version.
@@ -56,6 +64,6 @@ public abstract class RateLimit {
         }
     }
 
-    protected abstract boolean rateLimitedIP(String ip);
-    protected abstract boolean rateLimitedPhone(String phone);
+    protected abstract long rateLimitedIP(String ip);
+    protected abstract long rateLimitedPhone(String ip, String phone);
 }
