@@ -9,11 +9,15 @@ import java.util.HashMap;
  * Store rate limits in memory. Useful for debugging.
  */
 public class MemoryRateLimit extends RateLimit {
+    private static final long SECOND = 1000; // 1000ms = 1s
+    private static final long MINUTE = SECOND * 60;
+    private static final long HOUR = MINUTE * 60;
+    private static final long DAY = HOUR * 24;
+    private static final long WEEK = DAY * 7;
     private static final int TIMEOUT = 10; // timeout in seconds
     private static final int TRIES = 3;    // number of tries on first visit
 
     private static MemoryRateLimit instance;
-    private static Logger logger = LoggerFactory.getLogger(MemoryRateLimit.class);
 
     private HashMap<String, Long> ipLimits;
     private HashMap<String, Limit> phoneLimits;
@@ -30,35 +34,44 @@ public class MemoryRateLimit extends RateLimit {
         return instance;
     }
 
-    protected synchronized long rateLimitedIP(String ip) {
+    protected synchronized long nextTryIP(String ip, long now) {
         // Allow at most 1 try in each period (TIMEOUT), but kick in only
         // after 3 tries.
-        long now = System.currentTimeMillis();
-        long startLimit = now - TIMEOUT*1000*(TRIES-1);
-        if (!ipLimits.containsKey(ip)) {
-            // First visit
-            // Act like the last try was 3 periods ago.
-            ipLimits.put(ip, startLimit);
-        } else {
-            // Visited before
-            long limit = ipLimits.get(ip);
-            // Add a period to the current limit
-            limit = Math.max(startLimit, limit + TIMEOUT*1000);
-            // But if I try 100 times in one period (of which 97 are denied)
-            // I don't want to wait 97 periods - just one. I haven't actually
-            // used (much) resources those 97 periods or have removed a rogue
-            // user from my network etc.
-            ipLimits.put(ip, Math.min(limit, now));
-            if (limit > now) {
-                // Rate limited!
-                logger.warn("Denying request from {}: IP limit exceeded", ip);
-                return limit - now;
-            }
+        final long period = TIMEOUT*1000;
+        long startLimit = now - period*TRIES;
+        long limit = 0; // First try - last try was "long in the past".
+        if (ipLimits.containsKey(ip)) {
+            // Ah, there was a request before.
+            limit = ipLimits.get(ip);
         }
+        if (limit < startLimit) {
+            // First visit or previous visit was long ago.
+            // Act like the last try was 3 periods ago.
+            limit = startLimit;
+        }
+        // Add a period to the current limit.
+        limit += period;
+        // But if I try 100 times in one period (of which 97 are denied)
+        // I don't want to wait 97 periods - just one. I haven't actually
+        // used (much) resources those 97 periods or have removed a rogue
+        // user from my network etc.
+        if (limit > now+period) {
+            limit = now + period;
+        }
+        return limit;
+    }
+
+    protected synchronized long countIP(String ip, long now) {
+        long nextTry = nextTryIP(ip, now);
+        if (nextTry > now) {
+            // Rate limited!
+            return nextTry - now;
+        }
+        ipLimits.put(ip, nextTry);
         return 0;
     }
 
-    protected synchronized long rateLimitedPhone(String ip, String phone) {
+    protected synchronized long nextTryPhone(String phone, long now) {
         // Rate limiter durations (sort-of logarithmic):
         // 1   10 second
         // 2   5 minute
@@ -66,14 +79,6 @@ public class MemoryRateLimit extends RateLimit {
         // 4   1 week
         // 5+  1 per week
         // Keep log 4 weeks for proper limiting.
-
-        final long SECOND = 1000; // 1000ms = 1s
-        final long MINUTE = SECOND * 60;
-        final long HOUR = MINUTE * 60;
-        final long DAY = HOUR * 24;
-        final long WEEK = DAY * 7;
-
-        long now = System.currentTimeMillis();
 
         Limit limit = phoneLimits.get(phone);
         if (limit == null) {
@@ -98,13 +103,18 @@ public class MemoryRateLimit extends RateLimit {
                 nextTry = limit.timestamp + 1 * WEEK;
                 break;
             default:
-                throw new RuntimeException("invalid tries count");
+                throw new IllegalStateException("invalid tries count");
         }
+        return nextTry;
+    }
+
+    protected synchronized long countPhone(String phone, long now) {
+        long nextTry = nextTryPhone(phone, now);
+        Limit limit = phoneLimits.get(phone);
         if (nextTry > now) {
             // Denying this request.
             // Don't count this request, as the user hasn't actually caused
             // any load on the system (yet).
-            logger.warn("Denying request from {}: phone number limit exceeded", ip);
             return nextTry-now;
         }
         // Allowing this request, but counting the usage.

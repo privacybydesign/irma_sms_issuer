@@ -1,5 +1,8 @@
 package foundation.privacybydesign.sms.ratelimit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -8,6 +11,8 @@ import java.net.UnknownHostException;
  * for easier debugging and database for production).
  */
 public abstract class RateLimit {
+    private static Logger logger = LoggerFactory.getLogger(RateLimit.class);
+
     /** Take an IP address and a phone number and rate limit them.
      * @param remoteAddr IP address (IPv4 or IPv6 in any format)
      * @param phone phone number
@@ -16,17 +21,17 @@ public abstract class RateLimit {
      */
     public long rateLimited(String remoteAddr, String phone) {
         String addr = getAddressPrefix(remoteAddr);
-        // Note: when the phone limit is reached, the IP limit is incremented
-        // which might not be desired.
-        long retryAfter = rateLimitedIP(addr);
-        if (retryAfter > 0) {
-            // TODO: also take into account the phone rate limit
-            return retryAfter;
+        long now = System.currentTimeMillis();
+        long ipRetryAfter = nextTryIP(addr, now);
+        long phoneRetryAfter = nextTryPhone(phone, now);
+        long retryAfter = Math.max(ipRetryAfter, phoneRetryAfter);
+        if (retryAfter > now) {
+            logger.warn("Denying request from {}: rate limit (ip and/or phone) exceeded", addr);
+            // Don't count this request if it has been denied.
+            return retryAfter - now;
         }
-        retryAfter = rateLimitedPhone(addr, phone);
-        if (retryAfter > 0) {
-            return retryAfter;
-        }
+        countIP(addr, now);
+        countPhone(phone, now);
         return 0;
     }
 
@@ -64,6 +69,8 @@ public abstract class RateLimit {
         }
     }
 
-    protected abstract long rateLimitedIP(String ip);
-    protected abstract long rateLimitedPhone(String ip, String phone);
+    protected abstract long nextTryIP(String ip, long now);
+    protected abstract long nextTryPhone(String phone, long now);
+    protected abstract long countIP(String ip, long now);
+    protected abstract long countPhone(String phone, long now);
 }
