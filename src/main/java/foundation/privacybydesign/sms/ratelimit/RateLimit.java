@@ -11,7 +11,12 @@ public abstract class RateLimit {
     public boolean rateLimited(String remoteAddr, String phone) {
         String addr = getAddressPrefix(remoteAddr);
         System.out.println("checking " + addr);
+        // Note: when the phone limit is reached, the IP limit is incremented
+        // which might not be desired.
         if (rateLimitedIP(addr)) {
+            return true;
+        }
+        if (rateLimitedPhone(phone)) {
             return true;
         }
         return false;
@@ -52,4 +57,5 @@ public abstract class RateLimit {
     }
 
     protected abstract boolean rateLimitedIP(String ip);
+    protected abstract boolean rateLimitedPhone(String phone);
 }
