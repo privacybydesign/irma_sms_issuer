@@ -21,6 +21,7 @@ public abstract class RateLimit {
      */
     public long rateLimited(String remoteAddr, String phone) {
         String addr = getAddressPrefix(remoteAddr);
+        // TODO: normalize phone number
         long now = System.currentTimeMillis();
         long ipRetryAfter = nextTryIP(addr, now);
         long phoneRetryAfter = nextTryPhone(phone, now);

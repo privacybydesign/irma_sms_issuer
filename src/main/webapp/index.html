@@ -44,6 +44,21 @@
                             </span>
                         </div>
                     </form>
+                    <div id="block-token" style="display: none">
+                        <p>U heeft een token toegestuurd gekregen. Vul deze
+                            code hieronder in:</p>
+                        <form id="token-form">
+                            <div class="input-group">
+                                <input type="text" required class="form-control"
+                                       pattern="[0-9A-Za-z]{6}"
+                                       style="text-transform: uppercase"/>
+                                <span class="input-group-btn">
+                                    <input type="submit" class="btn btn-primary"
+                                           value="Verifieer"/>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
