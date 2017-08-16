@@ -1,5 +1,6 @@
 package foundation.privacybydesign.sms;
 
+import foundation.privacybydesign.sms.ratelimit.InvalidPhoneNumberException;
 import foundation.privacybydesign.sms.ratelimit.MemoryRateLimit;
 import foundation.privacybydesign.sms.ratelimit.RateLimit;
 import org.irmacard.api.common.ApiClient;
@@ -38,9 +39,6 @@ public class SMSRestApi {
     private static final String ERR_SENDING_SMS = "error:sending-sms";
     private static final String OK_RESPONSE = "OK"; // value doesn't really matter
 
-    // pattern made package-private for testing
-    static final String PHONE_PATTERN = "(0|\\+31|0031)6[1-9][0-9]{7}";
-
     RateLimit rateLimiter;
     private static final Logger logger = LoggerFactory.getLogger(SMSRestApi.class);
 
@@ -53,29 +51,29 @@ public class SMSRestApi {
     @Produces(MediaType.TEXT_PLAIN)
     public Response sendSmsCode(@Context HttpServletRequest req,
                                 @FormParam("phone") String phone) {
-        if (!phone.matches(PHONE_PATTERN)) {
-            return Response.status(Response.Status.BAD_REQUEST).entity
-                    (ERR_ADDRESS_MALFORMED).build();
+        try {
+            phone = RateLimit.canonicalPhoneNumber(phone);
+
+            long retryAfter = rateLimiter.rateLimited(req.getRemoteAddr(), phone);
+            if (retryAfter > 0) {
+                // 429 Too Many Requests
+                // https://tools.ietf.org/html/rfc6585#section-4
+                return Response.status(429)
+                        .entity(ERR_RATE_LIMITED)
+                        .header("Retry-After", (int) Math.ceil(retryAfter / 1000.0))
+                        .build();
+            }
+        } catch (InvalidPhoneNumberException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(ERR_ADDRESS_MALFORMED).build();
         }
 
-        long retryAfter = rateLimiter.rateLimited(req.getRemoteAddr(), phone);
-        if (retryAfter > 0) {
-            // 429 Too Many Requests
-            // https://tools.ietf.org/html/rfc6585#section-4
-            return Response.status(429)
-                    .entity(ERR_RATE_LIMITED)
-                    .header("Retry-After", (int) Math.ceil(retryAfter / 1000.0))
-                    .build();
-        }
-
-        // TODO: use canonical phone number
         String token = TokenManager.getInstance().generate(phone, req.getRemoteAddr());
 
         // Send the SMS token
         // https://stackoverflow.com/a/35013372/559350
         // TODO abstract this away
         Map<String, String> arguments = new HashMap<>();
-        // TODO: use the normalized phone number
         arguments.put("number", phone);
         // TODO: add URL to verify on the phone itself (if possible in 160
         // chars)
@@ -153,7 +151,13 @@ public class SMSRestApi {
             throws KeyManagementException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
-        // TODO use canonical phone number
+        try {
+            phone = RateLimit.canonicalPhoneNumber(phone);
+        } catch (InvalidPhoneNumberException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(ERR_ADDRESS_MALFORMED).build();
+        }
+
         if (!TokenManager.getInstance().verify(phone, req.getRemoteAddr(), token)) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity(ERR_CANNOT_VALIDATE).build();

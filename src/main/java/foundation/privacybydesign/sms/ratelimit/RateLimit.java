@@ -13,15 +13,19 @@ import java.net.UnknownHostException;
 public abstract class RateLimit {
     private static Logger logger = LoggerFactory.getLogger(RateLimit.class);
 
+    // pattern made package-private for testing
+    static final String PHONE_PATTERN = "(0|\\+31|0031)6[1-9][0-9]{7}";
+
     /** Take an IP address and a phone number and rate limit them.
      * @param remoteAddr IP address (IPv4 or IPv6 in any format)
      * @param phone phone number
      * @return the number of milliseconds that the client should wait - 0 if
      *         it shouldn't wait.
      */
-    public long rateLimited(String remoteAddr, String phone) {
+    public long rateLimited(String remoteAddr, String phone)
+            throws InvalidPhoneNumberException {
         String addr = getAddressPrefix(remoteAddr);
-        // TODO: normalize phone number
+        phone = canonicalPhoneNumber(phone);
         long now = System.currentTimeMillis();
         long ipRetryAfter = nextTryIP(addr, now);
         long phoneRetryAfter = nextTryPhone(phone, now);
@@ -68,6 +72,20 @@ public abstract class RateLimit {
             // Should Not Happen™
             throw new RuntimeException("host name lookup on IP address?");
         }
+    }
+
+    public static String canonicalPhoneNumber(String phone)
+            throws InvalidPhoneNumberException {
+        if (!phone.matches(PHONE_PATTERN)) {
+            throw new InvalidPhoneNumberException();
+        }
+        if (phone.startsWith("06")) {
+            return "+31" + phone.substring(1);
+        }
+        if (phone.startsWith("00316")) {
+            return "+31" + phone.substring(4);
+        }
+        return phone;
     }
 
     protected abstract long nextTryIP(String ip, long now);
