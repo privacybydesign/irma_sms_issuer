@@ -17,6 +17,7 @@ public class SMSConfiguration extends BaseConfiguration {
     private String sms_sender_address = "";
     private String sms_sender_token = "";
     private long token_validity = 0;
+    private String sms_prefix = "";
     private String server_name = "";
     private String human_readable_name = "";
     private String scheme_manager = "";
@@ -45,6 +46,8 @@ public class SMSConfiguration extends BaseConfiguration {
     public String getSMSSenderToken() { return sms_sender_token; }
 
     public long getSMSTokenValidity() { return token_validity; }
+
+    public String getSMSPrefix() { return sms_prefix; }
 
     public String getServerName() { return server_name; }
 

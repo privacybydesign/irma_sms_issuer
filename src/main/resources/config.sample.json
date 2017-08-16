@@ -2,6 +2,7 @@
   "sms_sender_addr": "",
   "sms_sender_token": "",
   "token_validity": 900,
+  "sms_prefix": "IRMA verificatecode: ",
   "private_key_path": "sk.der",
   "server_name": "irma_sms_issuer",
   "human_readable_name": "Privacy by Design Foundation",

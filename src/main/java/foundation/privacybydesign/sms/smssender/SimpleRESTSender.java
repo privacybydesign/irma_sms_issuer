@@ -21,15 +21,14 @@ public class SimpleRESTSender implements Sender {
     private static final Logger logger = LoggerFactory.getLogger(SimpleRESTSender.class);
 
     public void send(String phone, String token) throws IOException {
-        // Send the SMS token
+        SMSConfiguration conf = SMSConfiguration.getInstance();
         // https://stackoverflow.com/a/35013372/559350
-        // TODO abstract this away
         Map<String, String> arguments = new HashMap<>();
         arguments.put("number", phone);
         // TODO: add URL to verify on the phone itself (if possible in 160
         // chars)
-        arguments.put("message", "IRMA verify token: " + token);
-        arguments.put("token", SMSConfiguration.getInstance().getSMSSenderToken());
+        arguments.put("message", conf.getSMSPrefix() + token);
+        arguments.put("token", conf.getSMSSenderToken());
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, String> entry : arguments.entrySet()) {
             try {
