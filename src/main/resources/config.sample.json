@@ -1,5 +1,7 @@
 {
   "sms_sender_addr": "",
+  "sms_sender_param_phone": "phone",
+  "sms_sender_param_message": "message",
   "sms_sender_token": "",
   "token_validity": 900,
   "sms_prefix": "IRMA verificatecode: ",

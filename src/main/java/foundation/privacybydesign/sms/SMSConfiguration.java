@@ -15,6 +15,8 @@ public class SMSConfiguration extends BaseConfiguration {
     static final String CONFIG_FILENAME = "config.json";
 
     private String sms_sender_address = "";
+    private String sms_sender_param_phone = "";
+    private String sms_sender_param_message = "";
     private String sms_sender_token = "";
     private long token_validity = 0;
     private String sms_prefix = "";
@@ -42,6 +44,10 @@ public class SMSConfiguration extends BaseConfiguration {
     }
 
     public String getSMSSenderAddress() {return sms_sender_address; }
+
+    public String getSMSSenderParamPhone() { return sms_sender_param_phone; }
+
+    public String getSMSSenderParamMessage() { return sms_sender_param_message; }
 
     public String getSMSSenderToken() { return sms_sender_token; }
 

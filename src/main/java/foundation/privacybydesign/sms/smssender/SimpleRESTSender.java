@@ -22,13 +22,16 @@ public class SimpleRESTSender implements Sender {
 
     public void send(String phone, String token) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
-        // https://stackoverflow.com/a/35013372/559350
-        Map<String, String> arguments = new HashMap<>();
-        arguments.put("number", phone);
+
         // TODO: add URL to verify on the phone itself (if possible in 160
         // chars)
-        arguments.put("message", conf.getSMSPrefix() + token);
-        arguments.put("token", conf.getSMSSenderToken());
+        String message = conf.getSMSPrefix() + token;
+
+        // https://stackoverflow.com/a/35013372/559350
+        Map<String, String> arguments = new HashMap<>();
+        arguments.put(conf.getSMSSenderParamPhone(), phone);
+        arguments.put(conf.getSMSSenderParamMessage(), message);
+        arguments.put("token", conf.getSMSSenderToken()); // only used for one app
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, String> entry : arguments.entrySet()) {
             try {
@@ -59,12 +62,15 @@ public class SimpleRESTSender implements Sender {
                 throw new RuntimeException("cannot set POST as request method?");
             }
             http.setDoOutput(true);
-
             http.setFixedLengthStreamingMode(out.length);
             http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
             http.connect();
             os = http.getOutputStream();
-            os.write(out);
+            os.write(out); // unbuffered, so no need to flush
+            int code = http.getResponseCode();
+            if (code != 200) {
+                throw new IOException("Expected HTTP REST status code 200, but got " + http.getResponseMessage());
+            }
         } catch (MalformedURLException e) {
             // Configuration error.
             if (senderAddress.length() == 0) {
