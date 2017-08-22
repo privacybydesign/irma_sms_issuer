@@ -1,4 +1,10 @@
 {
+  "sms_sender_backend": "rest",
+  "sms_sender_ssh_host": "",
+  "sms_sender_ssh_host_rsa_key": "",
+  "sms_sender_ssh_user": "",
+  "sms_sender_ssh_key_path": ".ssh/id_rsa",
+  "sms_sender_ssh_key_passphrase": "",
   "sms_sender_addr": "",
   "sms_sender_param_phone": "phone",
   "sms_sender_param_message": "message",

@@ -14,6 +14,12 @@ public class SMSConfiguration extends BaseConfiguration {
     static SMSConfiguration instance;
     static final String CONFIG_FILENAME = "config.json";
 
+    private String sms_sender_backend = "";
+    private String sms_sender_ssh_host = "";
+    private String sms_sender_ssh_host_rsa_key = "";
+    private String sms_sender_ssh_user = "";
+    private String sms_sender_ssh_key_path = "";
+    private String sms_sender_ssh_key_passphrase = "";
     private String sms_sender_address = "";
     private String sms_sender_param_phone = "";
     private String sms_sender_param_message = "";
@@ -42,6 +48,18 @@ public class SMSConfiguration extends BaseConfiguration {
             instance = new SMSConfiguration();
         }
     }
+
+    public String getSMSSenderBackend() {return sms_sender_backend; }
+
+    public String getSMSSenderHost() {return sms_sender_ssh_host; }
+
+    public String getSMSSenderHostRsaKey() {return sms_sender_ssh_host_rsa_key; }
+
+    public String getSMSSenderUser() {return sms_sender_ssh_user; }
+
+    public String getSMSSenderKeyPath() {return sms_sender_ssh_key_path; }
+
+    public String getSMSSenderKeyPassphrase() {return sms_sender_ssh_key_passphrase; }
 
     public String getSMSSenderAddress() {return sms_sender_address; }
 

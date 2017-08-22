@@ -6,48 +6,18 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Simple REST implementation of an SMS sender.
  * Currently made for the "StartHere SMS Gateway App" but it could easily be
  * changed/extended for any other SMS gateway app based on REST.
  */
-public class SimpleRESTSender implements Sender {
+public class SimpleRESTSender extends Sender {
     private static final Logger logger = LoggerFactory.getLogger(SimpleRESTSender.class);
 
     public void send(String phone, String token) throws IOException {
-        SMSConfiguration conf = SMSConfiguration.getInstance();
-
-        // TODO: add URL to verify on the phone itself (if possible in 160
-        // chars)
-        String message = conf.getSMSPrefix() + token;
-
-        // https://stackoverflow.com/a/35013372/559350
-        Map<String, String> arguments = new HashMap<>();
-        arguments.put(conf.getSMSSenderParamPhone(), phone);
-        arguments.put(conf.getSMSSenderParamMessage(), message);
-        arguments.put("token", conf.getSMSSenderToken()); // only used for one app
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<String, String> entry : arguments.entrySet()) {
-            try {
-                if (builder.length() != 0) {
-                    builder.append("&");
-                }
-                builder.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-                builder.append("=");
-                builder.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // unreachable
-                throw new RuntimeException("Invalid encoding?");
-            }
-        }
-        byte[] out = builder.toString().getBytes(StandardCharsets.UTF_8);
-
+        byte[] out = getMessage(phone, token);
         String senderAddress = SMSConfiguration.getInstance().getSMSSenderAddress();
         OutputStream os = null;
         try {

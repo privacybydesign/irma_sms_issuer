@@ -3,6 +3,7 @@ package foundation.privacybydesign.sms;
 import foundation.privacybydesign.sms.ratelimit.InvalidPhoneNumberException;
 import foundation.privacybydesign.sms.ratelimit.MemoryRateLimit;
 import foundation.privacybydesign.sms.ratelimit.RateLimit;
+import foundation.privacybydesign.sms.smssender.SSHTunnelRESTSender;
 import foundation.privacybydesign.sms.smssender.Sender;
 import foundation.privacybydesign.sms.smssender.SimpleRESTSender;
 import org.irmacard.api.common.ApiClient;
@@ -66,7 +67,17 @@ public class SMSRestApi {
 
         String token = TokenManager.getInstance().generate(phone, req.getRemoteAddr());
 
-        Sender sender = new SimpleRESTSender();
+        Sender sender;
+        switch (SMSConfiguration.getInstance().getSMSSenderBackend()) {
+            case "rest":
+                sender = new SimpleRESTSender();
+                break;
+            case "ssh-rest":
+                sender = new SSHTunnelRESTSender();
+                break;
+            default:
+                throw new RuntimeException("Unknown SMS sender backend");
+        }
         try {
             sender.send(phone, token);
         } catch (IOException e) {
