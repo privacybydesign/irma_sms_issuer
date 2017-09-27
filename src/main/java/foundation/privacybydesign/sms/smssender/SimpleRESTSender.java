@@ -18,7 +18,8 @@ public class SimpleRESTSender extends Sender {
 
     public void send(String phone, String token) throws IOException {
         byte[] out = getMessage(phone, token);
-        String senderAddress = SMSConfiguration.getInstance().getSMSSenderAddress();
+        SMSConfiguration conf = SMSConfiguration.getInstance();
+        String senderAddress = conf.getSMSSenderAddress();
         OutputStream os = null;
         try {
             URL url = new URL(senderAddress);
@@ -31,6 +32,8 @@ public class SimpleRESTSender extends Sender {
                 // unreachable
                 throw new RuntimeException("cannot set POST as request method?");
             }
+            http.setConnectTimeout(conf.getSMSSenderTimeout());
+            http.setReadTimeout(conf.getSMSSenderTimeout());
             http.setDoOutput(true);
             http.setFixedLengthStreamingMode(out.length);
             http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");

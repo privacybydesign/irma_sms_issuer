@@ -29,6 +29,7 @@ public class SSHTunnelRESTSender extends Sender {
             // https://sourceforge.net/p/jsch/feature-requests/7/
             jsch.addIdentity(conf.getSMSSenderKeyPath(), conf.getSMSSenderKeyPassphrase());
             Session session = jsch.getSession(conf.getSMSSenderUser(), conf.getSMSSenderHost());
+            session.setTimeout(conf.getSMSSenderTimeout());
             session.connect();
 
             PipedInputStream chanIs = new PipedInputStream();
@@ -41,7 +42,7 @@ public class SSHTunnelRESTSender extends Sender {
             Channel chan = session.getStreamForwarder(url.getHost(), url.getPort());
             chan.setInputStream(chanIs);
             chan.setOutputStream(chanOs);
-            chan.connect();
+            chan.connect(conf.getSMSSenderTimeout());
 
             // Send the HTTP request
             // TODO use a real HTTP client

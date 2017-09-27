@@ -9,6 +9,7 @@
   "sms_sender_param_phone": "phone",
   "sms_sender_param_message": "message",
   "sms_sender_token": "",
+  "sms_sender_timeout": 5000,
   "token_validity": 900,
   "sms_prefix": "IRMA verificatecode: ",
   "private_key_path": "sk.der",

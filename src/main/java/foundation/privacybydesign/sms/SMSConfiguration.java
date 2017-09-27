@@ -24,6 +24,7 @@ public class SMSConfiguration extends BaseConfiguration {
     private String sms_sender_param_phone = "";
     private String sms_sender_param_message = "";
     private String sms_sender_token = "";
+    private int sms_sender_timeout = 0;
     private long token_validity = 0;
     private String sms_prefix = "";
     private String server_name = "";
@@ -68,6 +69,8 @@ public class SMSConfiguration extends BaseConfiguration {
     public String getSMSSenderParamMessage() { return sms_sender_param_message; }
 
     public String getSMSSenderToken() { return sms_sender_token; }
+
+    public int getSMSSenderTimeout() { return sms_sender_timeout; }
 
     public long getSMSTokenValidity() { return token_validity; }
 
