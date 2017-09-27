@@ -65,7 +65,7 @@ public class SMSRestApi {
                     .entity(ERR_ADDRESS_MALFORMED).build();
         }
 
-        String token = TokenManager.getInstance().generate(phone, req.getRemoteAddr());
+        String token = TokenManager.getInstance().generate(phone);
 
         Sender sender;
         switch (SMSConfiguration.getInstance().getSMSSenderBackend()) {
@@ -105,7 +105,7 @@ public class SMSRestApi {
                     .entity(ERR_ADDRESS_MALFORMED).build();
         }
 
-        if (!TokenManager.getInstance().verify(phone, req.getRemoteAddr(), token)) {
+        if (!TokenManager.getInstance().verify(phone, token)) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity(ERR_CANNOT_VALIDATE).build();
         }

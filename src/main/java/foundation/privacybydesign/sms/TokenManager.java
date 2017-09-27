@@ -33,7 +33,7 @@ public class TokenManager {
         return instance;
     }
 
-    public String generate(String phone, String addr) {
+    public String generate(String phone) {
         // https://stackoverflow.com/a/41156/559350
         // There are 30 bits. Using 32 possible values per char means
         // every char consumes exactly 5 bits, thus a token is 6 bytes.
@@ -49,23 +49,16 @@ public class TokenManager {
         token = token.replace('O', 'X');
         token = token.replace('1', 'Y');
         token = token.replace('I', 'Z');
-        tokenMap.put(phone, new TokenRequest(token, addr));
+        tokenMap.put(phone, new TokenRequest(token));
         return token;
     }
 
-    public boolean verify(String phone, String addr, String token) {
+    public boolean verify(String phone, String token) {
         TokenRequest tr = tokenMap.get(phone);
         SMSConfiguration conf = SMSConfiguration.getInstance();
         if (System.currentTimeMillis() - tr.created > conf.getSMSTokenValidity()*1000) {
             logger.error("Token {} expired", token);
             // TODO: report this error back to the user.
-            return false;
-        }
-        if (!CryptoUtil.isEqualsConstantTime(tr.addr.toCharArray(), addr.toCharArray())) {
-            logger.error("Token {} verified by the wrong IP address", token);
-            // Lock to an IP address.
-            // Constant-time comparison isn't really required here, but let's
-            // do it just to be sure.
             return false;
         }
         if (!CryptoUtil.isEqualsConstantTime(tr.token.toCharArray(), token.toCharArray())) {
@@ -87,12 +80,10 @@ public class TokenManager {
 class TokenRequest {
     public String token;
     public long created;
-    public String addr;
     public int tries;
 
-    public TokenRequest(String token, String addr) {
+    public TokenRequest(String token) {
         this.token = token;
-        this.addr = addr;
         created = System.currentTimeMillis();
         tries = 0;
     }
