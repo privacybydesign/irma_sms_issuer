@@ -35,7 +35,20 @@ public class TokenManager {
 
     public String generate(String phone, String addr) {
         // https://stackoverflow.com/a/41156/559350
+        // There are 30 bits. Using 32 possible values per char means
+        // every char consumes exactly 5 bits, thus a token is 6 bytes.
         String token = new BigInteger(30, random).toString(32).toUpperCase();
+        // ...but when the BigInteger is < 2**25, the first char is 0 and is
+        // thus ignored. Add it here at the start (humans count in big endian).
+        while (token.length() < 6) {
+            token = "0" + token;
+        }
+        // With a toString of 32, there are 4 alphanumeric chars left: WXYZ.
+        // Replace easy to confuse chars with those chars.
+        token = token.replace('0', 'W');
+        token = token.replace('O', 'X');
+        token = token.replace('1', 'Y');
+        token = token.replace('I', 'Z');
         tokenMap.put(phone, new TokenRequest(token, addr));
         return token;
     }
