@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,9 +18,10 @@ public abstract class Sender {
     protected byte[] getMessage(String phone, String token) {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
-        // TODO: add URL to verify on the phone itself (if possible in 160
-        // chars)
-        String message = conf.getSMSPrefix() + token;
+        Formatter formatter = new Formatter();
+        String message = formatter.format(conf.getSMSTemplate(),
+                token, conf.getSMSURLPrefix() + phone + ":" + token)
+                .toString();
 
         // https://stackoverflow.com/a/35013372/559350
         Map<String, String> arguments = new HashMap<>();

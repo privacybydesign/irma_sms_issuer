@@ -55,6 +55,10 @@ public class TokenManager {
 
     public boolean verify(String phone, String token) {
         TokenRequest tr = tokenMap.get(phone);
+        if (tr == null) {
+            logger.error("Phone number not found");
+            return false;
+        }
         SMSConfiguration conf = SMSConfiguration.getInstance();
         if (System.currentTimeMillis() - tr.created > conf.getSMSTokenValidity()*1000) {
             logger.error("Token {} expired", token);

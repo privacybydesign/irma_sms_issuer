@@ -17,25 +17,63 @@ var MESSAGES = {
     'error:cannot-validate-token': 'Kan token niet verifieren. Zit er geen typfout in?',
 };
 
-function onload() {
-    $('#phone-form').on('submit', onSubmitPhone);
-    $('#token-form').on('submit', onSubmitToken);
-}
-
 // This var is global, as we need it to verify a phone number.
 var phone;
 
+function onload() {
+    $('#phone-form').on('submit', onSubmitPhone);
+    $('#token-form').on('submit', onSubmitToken);
+
+    // Is this a link from a SMS message?
+    if (document.location.hash.substr(0, '#!verify:'.length) == '#!verify:') {
+        verifyTokenFromURL();
+    }
+}
+
+function verifyTokenFromURL() {
+    // format: #!verify:+3112345678:ABCDEF
+    var parts = document.location.hash.split(':');
+    if (parts.length != 3) {
+        return;
+    }
+
+    if ('history' in window) {
+        // remove hash
+        history.replaceState(null, '', document.location.pathname);
+    }
+
+    phone = parts[1];
+    var token = parts[2];
+
+    // Now do the same thing as when a user manually submitted the form
+    // Enter the phone number
+    $('#phone-form input[type=tel]').val(phone);
+    $('#phone-form input').prop('disabled', true);
+
+    // Get a token and fill it here
+    $('#token-form input[type=text]').val(token);
+    $('#block-token').show();
+
+    // And submit!
+    $('#token-form').submit();
+}
+
 function onSubmitPhone(e) {
     e.preventDefault();
+
+    // Disable first field
+    $('#phone-form input').prop('disabled', true);
+
     phone = $('#phone-form input[type=tel]').val().trim();
     setStatus('info', MESSAGES['sending-sms']);
-    $.post(API_ENDPOINT + 'send-sms-token', {phone: phone})
+    $.post(API_ENDPOINT + 'send', {phone: phone})
         .done(function(e) {
             console.log('sent SMS:', e);
             setStatus('info', MESSAGES['sms-sent']);
             $('#block-token').show();
         })
         .fail(function(e) {
+            $('#phone-form input').prop('disabled', false);
             var errormsg = e.responseText;
             console.error('failed to submit phone number:', errormsg);
             if (!errormsg || errormsg.substr(0, 6) != 'error:') {
@@ -55,7 +93,7 @@ function onSubmitToken(e) {
     e.preventDefault();
     var token = $('#token-form input[type=text]').val().trim().toUpperCase();
     setStatus('info', MESSAGES['verifying-token']);
-    $.post(API_ENDPOINT + 'verify-sms-token', {phone: phone, token: token})
+    $.post(API_ENDPOINT + 'verify', {phone: phone, token: token})
         .done(function(jwt) {
             console.log('received JWT:', jwt);
             setStatus('info', MESSAGES['issuing-credential']);

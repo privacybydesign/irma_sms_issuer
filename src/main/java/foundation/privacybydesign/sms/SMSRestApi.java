@@ -44,7 +44,7 @@ public class SMSRestApi {
     }
 
     @POST
-    @Path("send-sms-token")
+    @Path("send")
     @Produces(MediaType.TEXT_PLAIN)
     public Response sendSmsCode(@Context HttpServletRequest req,
                                 @FormParam("phone") String phone) {
@@ -90,9 +90,9 @@ public class SMSRestApi {
     }
 
     @POST
-    @Path("verify-sms-token")
+    @Path("verify")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response sendSmsCode(@Context HttpServletRequest req,
+    public Response verifySmsCode(@Context HttpServletRequest req,
                                 @FormParam("phone") String phone,
                                 @FormParam("token") String token)
             throws KeyManagementException {
