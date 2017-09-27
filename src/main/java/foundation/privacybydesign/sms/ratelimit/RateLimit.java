@@ -90,6 +90,6 @@ public abstract class RateLimit {
 
     protected abstract long nextTryIP(String ip, long now);
     protected abstract long nextTryPhone(String phone, long now);
-    protected abstract long countIP(String ip, long now);
-    protected abstract long countPhone(String phone, long now);
+    protected abstract void countIP(String ip, long now);
+    protected abstract void countPhone(String phone, long now);
 }

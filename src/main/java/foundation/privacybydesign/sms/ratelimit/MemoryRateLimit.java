@@ -6,7 +6,19 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 
 /**
- * Store rate limits in memory. Useful for debugging.
+ * Store rate limits in memory. Useful for debugging and rate limits that
+ * aren't very long.
+ *
+ * How it works:
+ * How much budget a user has, is expressed in a timestamp. The timestamp is
+ * initially some period in the past, but with every usage (countIP and
+ * countPhone) this timestamp is incremented. For IP address counting, this
+ * is a fixed amount (currently 10 seconds), but for phone numbers this
+ * amount is exponential.
+ *
+ * An algorithm with a similar goal is the Token Bucket algorithm. This
+ * algorithm probably works well, but seemed harder to implement.
+ * https://en.wikipedia.org/wiki/Token_bucket
  */
 public class MemoryRateLimit extends RateLimit {
     private static final long SECOND = 1000; // 1000ms = 1s
@@ -36,41 +48,36 @@ public class MemoryRateLimit extends RateLimit {
 
     protected synchronized long nextTryIP(String ip, long now) {
         // Allow at most 1 try in each period (TIMEOUT), but kick in only
-        // after 3 tries.
+        // after 3 tries. Thus while the user can do only 1 try per period
+        // over longer periods, the initial budget is 3 periods.
         final long period = TIMEOUT*1000;
-        long startLimit = now - period*TRIES;
         long limit = 0; // First try - last try was "long in the past".
         if (ipLimits.containsKey(ip)) {
             // Ah, there was a request before.
             limit = ipLimits.get(ip);
         }
+
+        long startLimit = now - period*TRIES;
         if (limit < startLimit) {
             // First visit or previous visit was long ago.
             // Act like the last try was 3 periods ago.
             limit = startLimit;
         }
+
         // Add a period to the current limit.
         limit += period;
-        // But if I try 100 times in one period (of which 97 are denied)
-        // I don't want to wait 97 periods - just one. I haven't actually
-        // used (much) resources those 97 periods or have removed a rogue
-        // user from my network etc.
-        if (limit > now+period) {
-            limit = now + period;
-        }
         return limit;
     }
 
-    protected synchronized long countIP(String ip, long now) {
+    protected synchronized void countIP(String ip, long now) {
         long nextTry = nextTryIP(ip, now);
         if (nextTry > now) {
-            // Rate limited!
-            return nextTry - now;
+            throw new IllegalStateException("counting rate limit while over the limit");
         }
         ipLimits.put(ip, nextTry);
-        return 0;
     }
 
+    // Is the user over the rate limit per phone number?
     protected synchronized long nextTryPhone(String phone, long now) {
         // Rate limiter durations (sort-of logarithmic):
         // 1   10 second
@@ -108,22 +115,19 @@ public class MemoryRateLimit extends RateLimit {
         return nextTry;
     }
 
-    protected synchronized long countPhone(String phone, long now) {
+    // Count the usage of this rate limit - adding to the budget for this
+    // phone number.
+    protected synchronized void countPhone(String phone, long now) {
         long nextTry = nextTryPhone(phone, now);
         Limit limit = phoneLimits.get(phone);
         if (nextTry > now) {
-            // Denying this request.
-            // Don't count this request, as the user hasn't actually caused
-            // any load on the system (yet).
-            return nextTry-now;
+            throw new IllegalStateException("counting rate limit while over the limit");
         }
-        // Allowing this request, but counting the usage.
         limit.tries = Math.min(limit.tries+1, 5); // add 1, max at 5
         // If the last usage was e.g. ≥3 weeks ago, we should allow them 3
         // extra tries this week. But don't go below 1 limit in the counter.
         limit.tries = (int)Math.max(1, limit.tries - (now-limit.timestamp)/WEEK);
         limit.timestamp = now;
-        return 0;
     }
 }
 
