@@ -4,7 +4,7 @@ var API_ENDPOINT = '/irma_sms_issuer/api/';
 
 var MESSAGES = {
     'sending-sms': 'SMS code wordt verstuurd...',
-    'sms-sent': 'Bericht verstuurd!',
+    'sms-sent': 'Code is verstuurd! U krijgt een bericht van <strong>%number%</strong>.',
     'verifying-token': 'Code wordt geverifieerd...',
     'issuing-credential': 'Credential uitgeven...',
     'second': '%n% seconde',
@@ -20,7 +20,7 @@ var MESSAGES = {
     'error:internal': 'Interne fout. Neem contact op met IRMA als dit vaker voorkomt.',
     'error:sending-sms': 'Kan de SMS niet verzenden. Dit is waarschijnlijk een probleem in IRMA. Neem contact op met IRMA als dit vaker voorkomt.',
     'error:ratelimit': 'Probeer het opnieuw over %time%.',
-    'error:cannot-validate-token': 'Kan token niet verifieren. Zit er geen typfout in?',
+    'error:cannot-validate-token': 'Kan code niet verifieren. Zit er geen typfout in?',
 };
 
 // This var is global, as we need it to verify a phone number.
@@ -75,7 +75,10 @@ function onSubmitPhone(e) {
     $.post(API_ENDPOINT + 'send', {phone: phone})
         .done(function(e) {
             console.log('sent SMS:', e);
-            setStatus('info', MESSAGES['sms-sent']);
+            var parts = e.split(':');
+            // parts[0] should be 'OK'
+            var senderNumber = parts[1];
+            setStatus('info', MESSAGES['sms-sent'].replace('%number%', senderNumber));
             $('#block-token').show();
         })
         .fail(function(e) {
@@ -157,7 +160,7 @@ function setStatus(alertType, message) {
         .removeClass('alert-warning')
         .removeClass('alert-danger')
         .addClass('alert-'+alertType)
-        .text(message)
+        .html(message)
         .removeClass('hidden');
 }
 

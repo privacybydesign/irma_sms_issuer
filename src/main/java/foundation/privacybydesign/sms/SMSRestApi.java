@@ -34,7 +34,7 @@ public class SMSRestApi {
     private static final String ERR_CANNOT_VALIDATE = "error:cannot-validate-token";
     private static final String ERR_RATE_LIMITED = "error:ratelimit";
     private static final String ERR_SENDING_SMS = "error:sending-sms";
-    private static final String OK_RESPONSE = "OK"; // value doesn't really matter
+    private static final String OK_RESPONSE = "OK:"; // prefix for number
 
     RateLimit rateLimiter;
     private static final Logger logger = LoggerFactory.getLogger(SMSRestApi.class);
@@ -86,7 +86,11 @@ public class SMSRestApi {
                     .entity(ERR_SENDING_SMS).build();
         }
 
-        return Response.status(Response.Status.OK).entity(OK_RESPONSE).build();
+        // It would be a bit nicer to switch to JSON responses, but this also
+        // works.
+        return Response.status(Response.Status.OK)
+                .entity(OK_RESPONSE + SMSConfiguration.getInstance().getSMSSenderNumber())
+                .build();
     }
 
     @POST
