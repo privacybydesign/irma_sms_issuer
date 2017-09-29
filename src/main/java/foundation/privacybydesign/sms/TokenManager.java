@@ -60,7 +60,7 @@ public class TokenManager {
             return false;
         }
         SMSConfiguration conf = SMSConfiguration.getInstance();
-        if (System.currentTimeMillis() - tr.created > conf.getSMSTokenValidity()*1000) {
+        if (tr.isExpired()) {
             logger.error("Token {} expired", token);
             // TODO: report this error back to the user.
             return false;
@@ -79,16 +79,29 @@ public class TokenManager {
         tokenMap.remove(phone);
         return true;
     }
+
+    void periodicCleanup() {
+        for (HashMap.Entry<String, TokenRequest> entry : tokenMap.entrySet()) {
+            if (entry.getValue().isExpired()) {
+                tokenMap.remove(entry.getKey());
+            }
+        }
+    }
 }
 
 class TokenRequest {
-    public String token;
-    public long created;
-    public int tries;
+    String token;
+    int tries;
+    private long created;
 
-    public TokenRequest(String token) {
+    TokenRequest(String token) {
         this.token = token;
         created = System.currentTimeMillis();
         tries = 0;
+    }
+
+    boolean isExpired() {
+        return System.currentTimeMillis() - this.created >
+                SMSConfiguration.getInstance().getSMSTokenValidity()*1000;
     }
 }

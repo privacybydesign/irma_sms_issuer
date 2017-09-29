@@ -25,8 +25,8 @@ public class MemoryRateLimit extends RateLimit {
     private static final long MINUTE = SECOND * 60;
     private static final long HOUR = MINUTE * 60;
     private static final long DAY = HOUR * 24;
-    private static final int TIMEOUT = 10; // timeout in seconds
-    private static final int TRIES = 3;    // number of tries on first visit
+    private static final int IP_TIMEOUT = 10 * 1000; // timeout in seconds
+    private static final int IP_TRIES = 3;           // number of tries on first visit
 
     private static MemoryRateLimit instance;
 
@@ -45,18 +45,21 @@ public class MemoryRateLimit extends RateLimit {
         return instance;
     }
 
+    private long startLimitIP(long now) {
+        return now - IP_TIMEOUT*IP_TRIES;
+    }
+
     protected synchronized long nextTryIP(String ip, long now) {
         // Allow at most 1 try in each period (TIMEOUT), but kick in only
         // after 3 tries. Thus while the user can do only 1 try per period
         // over longer periods, the initial budget is 3 periods.
-        final long period = TIMEOUT*1000;
         long limit = 0; // First try - last try was "long in the past".
         if (ipLimits.containsKey(ip)) {
             // Ah, there was a request before.
             limit = ipLimits.get(ip);
         }
 
-        long startLimit = now - period*TRIES;
+        long startLimit = startLimitIP(now);
         if (limit < startLimit) {
             // First visit or previous visit was long ago.
             // Act like the last try was 3 periods ago.
@@ -64,7 +67,7 @@ public class MemoryRateLimit extends RateLimit {
         }
 
         // Add a period to the current limit.
-        limit += period;
+        limit += IP_TIMEOUT;
         return limit;
     }
 
@@ -88,13 +91,13 @@ public class MemoryRateLimit extends RateLimit {
 
         Limit limit = phoneLimits.get(phone);
         if (limit == null) {
-            limit = new Limit();
+            limit = new Limit(now);
             phoneLimits.put(phone, limit);
         }
         long nextTry; // timestamp when the next request is allowed
         switch (limit.tries) {
             case 0: // try 1: always succeeds
-                nextTry = now;
+                nextTry = limit.timestamp;
                 break;
             case 1: // try 2: allowed after 10 seconds
                 nextTry = limit.timestamp + 10 * SECOND;
@@ -132,14 +135,28 @@ public class MemoryRateLimit extends RateLimit {
         }
         limit.timestamp = now;
     }
+
+    public void periodicCleanup() {
+        long now = System.currentTimeMillis();
+        for (HashMap.Entry<String, Long> entry : ipLimits.entrySet()) {
+            if (entry.getValue() < startLimitIP(now)) {
+                ipLimits.remove(entry.getKey());
+            }
+        }
+        for (HashMap.Entry<String, Limit> entry : phoneLimits.entrySet()) {
+            if (entry.getValue().timestamp < now - 5*DAY) {
+                phoneLimits.remove(entry.getKey());
+            }
+        }
+    }
 }
 
 class Limit {
-    public long timestamp;
-    public int tries;
+    long timestamp;
+    int tries;
 
-    Limit() {
+    Limit(long now) {
         tries = 0;
-        timestamp = 0;
+        timestamp = now;
     }
 }
