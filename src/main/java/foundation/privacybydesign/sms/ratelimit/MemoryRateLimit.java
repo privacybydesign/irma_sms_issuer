@@ -25,7 +25,6 @@ public class MemoryRateLimit extends RateLimit {
     private static final long MINUTE = SECOND * 60;
     private static final long HOUR = MINUTE * 60;
     private static final long DAY = HOUR * 24;
-    private static final long WEEK = DAY * 7;
     private static final int TIMEOUT = 10; // timeout in seconds
     private static final int TRIES = 3;    // number of tries on first visit
 
@@ -82,10 +81,10 @@ public class MemoryRateLimit extends RateLimit {
         // Rate limiter durations (sort-of logarithmic):
         // 1   10 second
         // 2   5 minute
-        // 3   12 hour
-        // 4   1 week
-        // 5+  1 per week
-        // Keep log 4 weeks for proper limiting.
+        // 3   1 hour
+        // 4   24 hour
+        // 5+  1 per day
+        // Keep log 5 days for proper limiting.
 
         Limit limit = phoneLimits.get(phone);
         if (limit == null) {
@@ -103,11 +102,11 @@ public class MemoryRateLimit extends RateLimit {
             case 2: // try 3: allowed after 5 minutes
                 nextTry = limit.timestamp + 5 * MINUTE;
                 break;
-            case 3: // try 4: allowed after 12 hours
-                nextTry = limit.timestamp + 12 * HOUR;
+            case 3: // try 4: allowed after 3 hours
+                nextTry = limit.timestamp + 3 * HOUR;
                 break;
-            case 4: // try 5: allowed after 1 week
-                nextTry = limit.timestamp + 1 * WEEK;
+            case 4: // try 5: allowed after 24 hours
+                nextTry = limit.timestamp + 24 * HOUR;
                 break;
             default:
                 throw new IllegalStateException("invalid tries count");
@@ -124,9 +123,13 @@ public class MemoryRateLimit extends RateLimit {
             throw new IllegalStateException("counting rate limit while over the limit");
         }
         limit.tries = Math.min(limit.tries+1, 5); // add 1, max at 5
-        // If the last usage was e.g. ≥3 weeks ago, we should allow them 3
-        // extra tries this week. But don't go below 1 limit in the counter.
-        limit.tries = (int)Math.max(1, limit.tries - (now-limit.timestamp)/WEEK);
+        // If the last usage was e.g. ≥2 days ago, we should allow them 2 tries
+        // extra tries this day.
+        long lastTryDaysAgo = (now-limit.timestamp)/DAY;
+        long bonusTries = limit.tries - lastTryDaysAgo;
+        if (bonusTries >= 1) {
+            limit.tries = (int)bonusTries;
+        }
         limit.timestamp = now;
     }
 }
