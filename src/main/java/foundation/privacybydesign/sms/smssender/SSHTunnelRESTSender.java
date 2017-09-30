@@ -69,6 +69,8 @@ public class SSHTunnelRESTSender extends Sender {
             if (!parts[1].equals("200")) {
                 throw new IOException("HTTP error: " + parts[1]);
             }
+            // TODO: a 200 response is sent even if the phone doesn't have a
+            // SIM card in it.
             os.close();
             is.close();
             chan.disconnect();

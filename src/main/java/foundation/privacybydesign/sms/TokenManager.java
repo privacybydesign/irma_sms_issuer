@@ -59,10 +59,9 @@ public class TokenManager {
             logger.error("Phone number not found");
             return false;
         }
-        SMSConfiguration conf = SMSConfiguration.getInstance();
         if (tr.isExpired()) {
+            // Expired, but not yet cleaned out by periodicCleanup()
             logger.error("Token {} expired", token);
-            // TODO: report this error back to the user.
             return false;
         }
         if (!CryptoUtil.isEqualsConstantTime(tr.token.toCharArray(), token.toCharArray())) {
