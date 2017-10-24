@@ -8,6 +8,7 @@ import foundation.privacybydesign.sms.SMSConfiguration;
 
 import javax.ws.rs.InternalServerErrorException;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -27,7 +28,12 @@ public class SSHTunnelRESTSender extends Sender {
             jsch.setKnownHosts(new ByteArrayInputStream(knownHosts.getBytes()));
             // Unfortunately, JSch doesn't support ed25519 keys.
             // https://sourceforge.net/p/jsch/feature-requests/7/
-            jsch.addIdentity(conf.getSMSSenderKeyPath(), conf.getSMSSenderKeyPassphrase());
+
+            URL sshkey = SSHTunnelRESTSender.class.getClassLoader().getResource(conf.getSMSSenderKeyPath());
+            if (sshkey == null) {
+                throw new IOException("SSH private key not found");
+            }
+            jsch.addIdentity(sshkey.getPath(), conf.getSMSSenderKeyPassphrase());
             Session session = jsch.getSession(conf.getSMSSenderUser(), conf.getSMSSenderHost());
             session.setTimeout(conf.getSMSSenderTimeout());
             session.connect();
@@ -75,7 +81,7 @@ public class SSHTunnelRESTSender extends Sender {
             is.close();
             chan.disconnect();
             session.disconnect();
-        } catch (java.net.MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new InternalServerErrorException("cannot parse configured URL");
         } catch (JSchException e) {
             throw new IOException("JSch error: " + e.getMessage());
