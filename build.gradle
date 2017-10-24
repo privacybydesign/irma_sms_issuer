@@ -1,5 +1,5 @@
-group 'foundation.privacybydesign.sms'
-version '1.0'
+group = 'foundation.privacybydesign.sms'
+version = '1.0'
 
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
@@ -42,4 +42,8 @@ configurations.all {
     // shouldn't happen. See also:
     // https://www.slf4j.org/codes.html#multiple_bindings
     exclude module: 'slf4j-nop'
+}
+
+gretty {
+    contextConfigFile = file('src/test/resources/jetty-env.xml')
 }
