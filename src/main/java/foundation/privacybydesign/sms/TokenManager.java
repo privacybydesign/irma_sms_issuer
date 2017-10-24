@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generate and verify tokens sent in the SMS message.
@@ -80,7 +81,7 @@ public class TokenManager {
     }
 
     void periodicCleanup() {
-        for (HashMap.Entry<String, TokenRequest> entry : tokenMap.entrySet()) {
+        for (Map.Entry<String, TokenRequest> entry : tokenMap.entrySet()) {
             if (entry.getValue().isExpired()) {
                 tokenMap.remove(entry.getKey());
             }

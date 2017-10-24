@@ -1,9 +1,7 @@
 package foundation.privacybydesign.sms.ratelimit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Store rate limits in memory. Useful for debugging and rate limits that
@@ -138,12 +136,12 @@ public class MemoryRateLimit extends RateLimit {
 
     public void periodicCleanup() {
         long now = System.currentTimeMillis();
-        for (HashMap.Entry<String, Long> entry : ipLimits.entrySet()) {
+        for (Map.Entry<String, Long> entry : ipLimits.entrySet()) {
             if (entry.getValue() < startLimitIP(now)) {
                 ipLimits.remove(entry.getKey());
             }
         }
-        for (HashMap.Entry<String, Limit> entry : phoneLimits.entrySet()) {
+        for (Map.Entry<String, Limit> entry : phoneLimits.entrySet()) {
             if (entry.getValue().timestamp < now - 5*DAY) {
                 phoneLimits.remove(entry.getKey());
             }
