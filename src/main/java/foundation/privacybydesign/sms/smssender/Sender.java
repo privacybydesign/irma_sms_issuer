@@ -27,7 +27,6 @@ public abstract class Sender {
         Map<String, String> arguments = new HashMap<>();
         arguments.put(conf.getSMSSenderParamPhone(), phone);
         arguments.put(conf.getSMSSenderParamMessage(), message);
-        arguments.put("token", conf.getSMSSenderToken()); // only used for one app
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, String> entry : arguments.entrySet()) {
             try {
