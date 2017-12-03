@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>Telefoonnummer toevoegen</title>
+        <title>Adding a mobile phone number attribute</title>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <meta value="https://privacybydesign.foundation/tomcat/irma_api_server/server/" name="irma-web-server">
         <meta value="https://privacybydesign.foundation/tomcat/irma_api_server/api/v2/" name="irma-api-server">
@@ -18,21 +18,20 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3">
-                    <h1>Telefoonnummer toevoegen</h1>
+                    <h1>Adding a mobile phone number attribute</h1>
 
                     <div id="status" class="alert hidden" role="alert"></div>
 
-                    <p>Hier kunt u een telefoonnummer als attribuut toevoegen
-                        aan uw IRMA app. Dit werkt als volgt:</p>
+                    <p>On this page you can add a (mobile, Dutch) telephone number as a new attribute to your IRMA app. This can be done multiple times, for different numbers. It works via the following three steps.</p>
                     <ol>
-                        <li>Vul uw telefoonnummer hieronder in, en klik op de
-                            knop 'Voeg toe'.</li>
-                        <li>Naar het telefoonnummer dat u opgeeft wordt een
-                            SMS met een verificatie-code gestuurt. Vul de
-                            code hier in.</li>
-                        <li>Scan de QR-code die verschijnt met uw IRMA-app,
-                            daarmee verschijnt uw mobiele nummer als attribuut
-                            in uw telefoon.</li>
+                        <li>Fill in your phone number below, and
+                            click the 'Send SMS' button.</li>
+                        <li>A text message will then be sent to this
+                            number with a verfication code. Enter this
+                            code below.</li>
+                        <li>Scan the resulting QR-code with your
+                            IRMA-app, and follow the instructions in
+                            the app.</li>
                     </ol>
                     <form id="phone-form">
                         <div class="input-group">
@@ -42,7 +41,7 @@
                                    pattern=" *(0|0031|\+31)6[1-9][0-9]{7} *"/>
                             <span class="input-group-btn">
                                 <input type="submit" class="btn btn-primary"
-                                       value="Verstuur SMS"/>
+                                       value="Send SMS"/>
                             </span>
                         </div>
                     </form>
@@ -56,11 +55,16 @@
                                        style="text-transform: uppercase"/>
                                 <span class="input-group-btn">
                                     <input type="submit" class="btn btn-primary"
-                                           value="Verifieer"/>
+                                           value="Verify"/>
                                 </span>
                             </div>
                         </form>
                     </div>
+		    <br>
+		    <br>
+		    <p>
+		      <a href="https://privacybydesign.foundation/issuance/">Back</a> to attribute issuance.
+		    </p>
                 </div>
             </div>
         </div>
