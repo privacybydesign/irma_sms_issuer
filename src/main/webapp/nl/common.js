@@ -1,6 +1,6 @@
 'use strict';
 
-var API_ENDPOINT = '/irma_sms_issuer/api/';
+var API_ENDPOINT = '/tomcat/irma_sms_issuer/api/';
 
 var MESSAGES = {
     'sending-sms': 'SMS code wordt verstuurd...',
