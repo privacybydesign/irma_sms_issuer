@@ -11,8 +11,10 @@
   "sms_sender_timeout": 5000,
   "sms_sender_number": "",
   "token_validity": 900,
-  "sms_template": "IRMA verificatecode: %s\nOf direct via een link:\n%s",
-  "sms_url_prefix": "https://privacybydesign.foundation/uitgifte/sms#!verify:",
+  "sms_templates": {
+    "nl": "IRMA verificatecode: %s\nOf direct via een link:\nhttps://privacybydesign.foundation/uitgifte/telefoonnummer#!verify:%s",
+    "en": "IRMA verification code: %s\nOr directly via a URL:\nhttps://privacybydesign.foundation/issuance/phonenumber#!verify:%s"
+  },
   "private_key_path": "sk.der",
   "server_name": "irma_sms_issuer",
   "human_readable_name": "Privacy by Design Foundation",

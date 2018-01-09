@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.irmacard.api.common.util.GsonUtil;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Configuration manager. The config itself is stored in config.json, which
@@ -26,8 +27,7 @@ public class SMSConfiguration extends BaseConfiguration {
     private int sms_sender_timeout = 0;
     private String sms_sender_number = "";
     private long token_validity = 0;
-    private String sms_template = "";
-    private String sms_url_prefix = "";
+    private Map<String, String> sms_templates = null;
     private String server_name = "";
     private String human_readable_name = "";
     private String scheme_manager = "";
@@ -75,9 +75,7 @@ public class SMSConfiguration extends BaseConfiguration {
 
     public long getSMSTokenValidity() { return token_validity; }
 
-    public String getSMSTemplate() { return sms_template; }
-
-    public String getSMSURLPrefix() { return sms_url_prefix; }
+    public String getSMSTemplate(String language) { return sms_templates.get(language); }
 
     public String getServerName() { return server_name; }
 

@@ -47,7 +47,8 @@ public class SMSRestApi {
     @Path("send")
     @Produces(MediaType.TEXT_PLAIN)
     public Response sendSmsCode(@Context HttpServletRequest req,
-                                @FormParam("phone") String phone) {
+                                @FormParam("phone") String phone,
+                                @FormParam("language") String language) {
         try {
             phone = RateLimit.canonicalPhoneNumber(phone);
 
@@ -79,7 +80,7 @@ public class SMSRestApi {
                 throw new RuntimeException("Unknown SMS sender backend");
         }
         try {
-            sender.send(phone, token);
+            sender.send(language, phone, token);
         } catch (IOException e) {
             logger.error("Failed to send SMS: " + e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

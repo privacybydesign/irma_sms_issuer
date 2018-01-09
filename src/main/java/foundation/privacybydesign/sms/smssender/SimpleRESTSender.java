@@ -16,8 +16,8 @@ import java.net.*;
 public class SimpleRESTSender extends Sender {
     private static final Logger logger = LoggerFactory.getLogger(SimpleRESTSender.class);
 
-    public void send(String phone, String token) throws IOException {
-        byte[] out = getMessage(phone, token);
+    public void send(String language, String phone, String token) throws IOException {
+        byte[] out = getMessage(language, phone, token);
         SMSConfiguration conf = SMSConfiguration.getInstance();
         String senderAddress = conf.getSMSSenderAddress();
         OutputStream os = null;

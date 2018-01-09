@@ -16,10 +16,10 @@ import java.net.URL;
  */
 public class SSHTunnelRESTSender extends Sender {
 
-    public void send(String phone, String token) throws IOException {
+    public void send(String language, String phone, String token) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
-        byte[] out = getMessage(phone, token);
+        byte[] out = getMessage(language, phone, token);
 
         try {
             // Set up the HTTP connection
