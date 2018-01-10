@@ -51,7 +51,7 @@ function onSubmitPhone(e) {
 
     phone = $('#phone-form input[type=tel]').val().trim();
     setStatus('info', MESSAGES['sending-sms']);
-    $.post(API_ENDPOINT + 'send', {phone: phone})
+    $.post(API_ENDPOINT + 'send', {phone: phone, language: MESSAGES['lang']})
         .done(function(e) {
             console.log('sent SMS:', e);
             var parts = e.split(':');

@@ -15,12 +15,12 @@ import java.util.Map;
  * Subclasses can implement how the message is actually delivered.
  */
 public abstract class Sender {
-    protected byte[] getMessage(String phone, String token) {
+    protected byte[] getMessage(String language, String phone, String token) {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
         Formatter formatter = new Formatter();
-        String message = formatter.format(conf.getSMSTemplate(),
-                token, conf.getSMSURLPrefix() + phone + ":" + token)
+        String message = formatter.format(conf.getSMSTemplate(language),
+                token, phone + ":" + token)
                 .toString();
 
         // https://stackoverflow.com/a/35013372/559350
@@ -44,5 +44,5 @@ public abstract class Sender {
         return builder.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    abstract public void send(String phone, String token) throws IOException;
+    abstract public void send(String language, String phone, String token) throws IOException;
 }
