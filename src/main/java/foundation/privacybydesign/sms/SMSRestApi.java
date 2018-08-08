@@ -1,5 +1,8 @@
 package foundation.privacybydesign.sms;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import foundation.privacybydesign.sms.ratelimit.InvalidPhoneNumberException;
 import foundation.privacybydesign.sms.ratelimit.MemoryRateLimit;
 import foundation.privacybydesign.sms.ratelimit.RateLimit;
@@ -15,7 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,11 +42,45 @@ public class SMSRestApi {
     private static final String ERR_SENDING_SMS = "error:sending-sms";
     private static final String OK_RESPONSE = "OK:"; // prefix for number
 
-    RateLimit rateLimiter;
+    private RateLimit rateLimiter;
     private static final Logger logger = LoggerFactory.getLogger(SMSRestApi.class);
+
+    // pattern made package-private for testing
+    static private final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+    // Derived from acceptable EU countries in countries.txt
+    // There is a corresponding list with matching entries in the webclient
+    static private final String[] countries = { "AT", "PT", "BE", "BG", "IC", "CY", "DK", "DE", "EE", "FO", "FI", "FR",
+            "GF", "GI", "GR", "GP", "GG", "HU", "IE", "IS", "IM", "IT", "JE", "HR", "LV", "LT",
+            "LI", "LU", "MT", "MQ", "YT", "MC", "NL", "NO", "AT", "PL", "PT", "RE", "RO", "SM",
+            "SI", "SK", "ES", "CZ", "VA", "UK", "SE", "CH" };
 
     public SMSRestApi() {
         rateLimiter = MemoryRateLimit.getInstance();
+    }
+
+    public static String canonicalPhoneNumber(String phone)
+            throws InvalidPhoneNumberException {
+        if (!phone.startsWith("+")) // The webclient only ever sends international numbers
+            throw new InvalidPhoneNumberException();
+        Phonenumber.PhoneNumber number;
+        try {
+            number = phoneUtil.parse(phone, null);
+        } catch (NumberParseException e) {
+            throw new InvalidPhoneNumberException();
+        }
+
+        for (String country : countries) {
+            if (phoneUtil.isValidNumberForRegion(number, country)) {
+                // We should only go ahead if it is a mobile number, or if we can't tell wether it is a mobile number
+                PhoneNumberUtil.PhoneNumberType type = phoneUtil.getNumberType(number);
+                if (type == PhoneNumberUtil.PhoneNumberType.MOBILE || type == PhoneNumberUtil.PhoneNumberType.UNKNOWN)
+                    return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
+                else
+                    throw new InvalidPhoneNumberException();
+            }
+        }
+
+        throw new InvalidPhoneNumberException();
     }
 
     @POST
@@ -50,7 +90,7 @@ public class SMSRestApi {
                                 @FormParam("phone") String phone,
                                 @FormParam("language") String language) {
         try {
-            phone = RateLimit.canonicalPhoneNumber(phone);
+            phone = canonicalPhoneNumber(phone);
 
             long retryAfter = rateLimiter.rateLimited(req.getRemoteAddr(), phone);
             if (retryAfter > 0) {
@@ -104,7 +144,7 @@ public class SMSRestApi {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
         try {
-            phone = RateLimit.canonicalPhoneNumber(phone);
+            phone = canonicalPhoneNumber(phone);
         } catch (InvalidPhoneNumberException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(ERR_ADDRESS_MALFORMED).build();
