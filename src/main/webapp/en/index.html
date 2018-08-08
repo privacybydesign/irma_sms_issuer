@@ -9,9 +9,12 @@
         <meta value="https://privacybydesign.foundation/tomcat/irma_api_server/api/v2/" name="irma-api-server">
 
         <link rel="stylesheet" href="https://privacybydesign.foundation/tomcat/irma_api_server/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="telwidget/css/intlTelInput.min.css">
+        <link rel="stylesheet" href="common.css">
 
         <script src="https://privacybydesign.foundation/tomcat/irma_api_server/bower_components/jquery/dist/jquery.js" defer></script>
         <script src="https://privacybydesign.foundation/tomcat/irma_api_server/client/irma.js" defer></script>
+        <script src="telwidget/js/intlTelInput.min.js" defer></script>
         <script src="messages.js" defer></script>
         <script src="common.js" defer></script>
     </head>
@@ -36,10 +39,7 @@
                     </ol>
                     <form id="phone-form">
                         <div class="input-group">
-                            <input type="tel" required class="form-control"
-                                   placeholder="0612345678"
-                                   title="vul een Nederlands mobiel nummer in"
-                                   pattern=" *(0|0031|\+31)6[1-9][0-9]{7} *"/>
+                            <input required id="phone" name="phone" class="form-control" type="tel">
                             <span class="input-group-btn">
                                 <input type="submit" class="btn btn-primary"
                                        value="Send SMS"/>

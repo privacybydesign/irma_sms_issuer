@@ -5,13 +5,52 @@ var API_ENDPOINT = '/tomcat/irma_sms_issuer/api/';
 // This var is global, as we need it to verify a phone number.
 var phone;
 
-function onload() {
+$(function() {
     $('#phone-form').on('submit', onSubmitPhone);
     $('#token-form').on('submit', onSubmitToken);
 
     // Is this a link from a SMS message?
     if (document.location.hash.substr(0, '#!verify:'.length) == '#!verify:') {
         verifyTokenFromURL();
+    }
+
+    // Use country names translated into their own language
+    var countryData = $.fn.intlTelInput.getCountryData();
+    $.each(countryData, function(i, country) {
+        country.name = country.name.replace(/.+\((.+)\)/, '$1');
+    });
+
+    var telInput = $('#phone');
+    telInput.change(validateInput);
+    telInput.keyup(validateInput);
+    telInput.intlTelInput({
+        // geoIpLookup: function(callback) {
+        //   $.get('http://ipinfo.io', function() {}, 'jsonp').always(function(resp) {
+        //     var countryCode = (resp && resp.country) ? resp.country : '';
+        //     callback(countryCode);
+        //   });
+        // },
+        initialCountry: 'nl',
+        preferredCountries: ['nl'],
+        onlyCountries: ['at', 'pt', 'be', 'bg', 'ic', 'cy', 'dk', 'de', 'ee', 'fo', 'fi', 'fr',
+            'gf', 'gi', 'gr', 'gp', 'gg', 'hu', 'ie', 'is', 'im', 'it', 'je', 'hr', 'lv', 'lt',
+            'li', 'lu', 'mt', 'mq', 'yt', 'mc', 'nl', 'no', 'at', 'pl', 'pt', 're', 'ro', 'sm',
+            'si', 'sk', 'es', 'cz', 'va', 'uk', 'se', 'ch'],
+        utilsScript: 'telwidget/js/utils.js'
+    });
+});
+
+function validateInput() {
+    var telInput = $('#phone');
+    telInput.removeClass('error');
+    if ($.trim(telInput.val())) {
+        if (telInput.intlTelInput('isValidNumber')) {
+            $('input[type=submit]').prop('disabled', false);
+        } else {
+            $('input[type=submit]').prop('disabled', true);
+            $('#error-msg').removeClass('hide');
+            telInput.addClass('error');
+        }
     }
 }
 
@@ -49,7 +88,7 @@ function onSubmitPhone(e) {
     // Disable first field
     $('#phone-form input').prop('disabled', true);
 
-    phone = $('#phone-form input[type=tel]').val().trim();
+    phone = $("#phone").intlTelInput("getNumber");
     setStatus('info', MESSAGES['sending-sms']);
     $.post(API_ENDPOINT + 'send', {phone: phone, language: MESSAGES['lang']})
         .done(function(e) {
@@ -142,5 +181,3 @@ function setStatus(alertType, message) {
         .html(message)
         .removeClass('hidden');
 }
-
-onload();

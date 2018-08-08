@@ -1,5 +1,8 @@
 package foundation.privacybydesign.sms.ratelimit;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +17,14 @@ public abstract class RateLimit {
     private static Logger logger = LoggerFactory.getLogger(RateLimit.class);
 
     // pattern made package-private for testing
-    static final String PHONE_PATTERN = "(0|\\+31|0031)6[1-9][0-9]{7}";
+    static private final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+    // Derived from acceptable EU countries in countries.txt
+    // There is a corresponding list with matching entries in the webclient
+    static private final String[] countries = { "AT", "PT", "BE", "BG", "IC", "CY", "DK", "DE", "EE", "FO", "FI", "FR",
+            "GF", "GI", "GR", "GP", "GG", "HU", "IE", "IS", "IM", "IT", "JE", "HR", "LV", "LT",
+            "LI", "LU", "MT", "MQ", "YT", "MC", "NL", "NO", "AT", "PL", "PT", "RE", "RO", "SM",
+            "SI", "SK", "ES", "CZ", "VA", "UK", "SE", "CH" };
+
 
     /** Take an IP address and a phone number and rate limit them.
      * @param remoteAddr IP address (IPv4 or IPv6 in any format)
@@ -25,7 +35,6 @@ public abstract class RateLimit {
     public long rateLimited(String remoteAddr, String phone)
             throws InvalidPhoneNumberException {
         String addr = getAddressPrefix(remoteAddr);
-        phone = canonicalPhoneNumber(phone);
         long now = System.currentTimeMillis();
         long ipRetryAfter = nextTryIP(addr, now);
         long phoneRetryAfter = nextTryPhone(phone, now);
@@ -76,16 +85,27 @@ public abstract class RateLimit {
 
     public static String canonicalPhoneNumber(String phone)
             throws InvalidPhoneNumberException {
-        if (!phone.matches(PHONE_PATTERN)) {
+        if (!phone.startsWith("+")) // The webclient only ever sends international numbers
+            throw new InvalidPhoneNumberException();
+        Phonenumber.PhoneNumber number = null;
+        try {
+            number = phoneUtil.parse(phone, null);
+        } catch (NumberParseException e) {
             throw new InvalidPhoneNumberException();
         }
-        if (phone.startsWith("06")) {
-            return "+31" + phone.substring(1);
+
+        for (String country : countries) {
+            if (phoneUtil.isValidNumberForRegion(number, country)) {
+                // We should only go ahead if it is a mobile number, or if we can't tell wether it is a mobile number
+                PhoneNumberUtil.PhoneNumberType type = phoneUtil.getNumberType(number);
+                if (type == PhoneNumberUtil.PhoneNumberType.MOBILE || type == PhoneNumberUtil.PhoneNumberType.UNKNOWN)
+                    return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
+                else
+                    throw new InvalidPhoneNumberException();
+            }
         }
-        if (phone.startsWith("00316")) {
-            return "+31" + phone.substring(4);
-        }
-        return phone;
+
+        throw new InvalidPhoneNumberException();
     }
 
     protected abstract long nextTryIP(String ip, long now);
