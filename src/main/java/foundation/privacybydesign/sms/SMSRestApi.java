@@ -49,10 +49,11 @@ public class SMSRestApi {
     static private final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
     // Derived from acceptable EU countries in countries.txt
     // There is a corresponding list with matching entries in the webclient
-    static private final String[] countries = { "AT", "PT", "BE", "BG", "IC", "CY", "DK", "DE", "EE", "FO", "FI", "FR",
-            "GF", "GI", "GR", "GP", "GG", "HU", "IE", "IS", "IM", "IT", "JE", "HR", "LV", "LT",
-            "LI", "LU", "MT", "MQ", "YT", "MC", "NL", "NO", "AT", "PL", "PT", "RE", "RO", "SM",
-            "SI", "SK", "ES", "CZ", "VA", "UK", "SE", "CH" };
+    static private final String[] countries = {
+            "AT", "BE", "BG", "CY", "DK", "DE", "EE", "FI", "FR", "GR", "HU", "IE",
+            "IS", "IT", "HR", "LV", "LT", "LI", "LU", "MT", "MC", "NL", "NO", "AT",
+            "PL", "PT", "RO", "SI", "SK", "ES", "CZ", "UK", "SE", "CH"
+    };
 
     public SMSRestApi() {
         rateLimiter = MemoryRateLimit.getInstance();

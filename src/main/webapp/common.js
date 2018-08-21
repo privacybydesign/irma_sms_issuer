@@ -32,10 +32,11 @@ $(function() {
         // },
         initialCountry: 'nl',
         preferredCountries: ['nl'],
-        onlyCountries: ['at', 'pt', 'be', 'bg', 'ic', 'cy', 'dk', 'de', 'ee', 'fo', 'fi', 'fr',
-            'gf', 'gi', 'gr', 'gp', 'gg', 'hu', 'ie', 'is', 'im', 'it', 'je', 'hr', 'lv', 'lt',
-            'li', 'lu', 'mt', 'mq', 'yt', 'mc', 'nl', 'no', 'at', 'pl', 'pt', 're', 'ro', 'sm',
-            'si', 'sk', 'es', 'cz', 'va', 'uk', 'se', 'ch'],
+        onlyCountries: [
+            'at', 'be', 'bg', 'cy', 'dk', 'de', 'ee', 'fi', 'fr', 'gr', 'hu', 'ie',
+            'is', 'it', 'hr', 'lv', 'lt', 'li', 'lu', 'mt', 'mc', 'nl', 'no', 'at',
+            'pl', 'pt', 'ro', 'si', 'sk', 'es', 'cz', 'uk', 'se', 'ch'
+        ],
         utilsScript: 'telwidget/js/utils.js'
     });
 });

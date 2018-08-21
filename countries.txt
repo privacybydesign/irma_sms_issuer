@@ -1,51 +1,37 @@
-Derived from: https://www.kpn.com/mobiel-abonnement/bundels/buitenland/binnen-eu.htm
+Derived from: https://www.simyo.nl/templates/assets/pdf/tarieven/tarieven_abonnementen_buitenland.pdf and https://nl.wikipedia.org/wiki/Lijst_van_lidstaten_van_de_Europese_Unie#Lidstaten
 Coutry codes: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
 Andorra - at
-Azoren - pt
 België - be
 Bulgarije - bg
-Canarische eilanden - ic
 Cyprus (Grieks gedeelte) - cy
 Denemarken - dk
 Duitsland - de
 Estland - ee
-Faeröer - fo
 Finland - fi
 Frankrijk - fr
-Frans Guyana - gf
-Gibraltar - gi
 Griekenland - gr
-Guadeloupe - gp
-Guernsey - gg
 Hongarije - hu
 Ierland - ie
 IJsland - is
-Isle of Man - im
 Italië - it
-Jersey - je
 Kroatië - hr
 Letland - lv
 Litouwen - lt
 Liechtenstein - li
 Luxemburg - lu
 Malta - mt
-Martinique - mq
-Mayotte - yt
 Monaco - mc
 Nederland - nl
 Noorwegen - no
 Oostenrijk - at
 Polen - pl
 Portugal - pt
-Réunion - re
 Roemenië - ro
-San Marino - sm
 Slovenië - si
 Slowakije - sk
 Spanje - es
 Tsjechië - cz
-Vaticaanstad - va
 Verenigd Koninkrijk - uk
 Zweden - se
 Zwitserland - ch
