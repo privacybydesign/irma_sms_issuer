@@ -22,3 +22,7 @@ input[type="tel"] {
 .flag-container {
   z-index: 4;
 }
+
+#block-token {
+  margin-top: 1em;
+}
