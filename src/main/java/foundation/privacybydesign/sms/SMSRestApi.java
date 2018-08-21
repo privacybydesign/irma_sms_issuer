@@ -74,7 +74,9 @@ public class SMSRestApi {
             if (phoneUtil.isValidNumberForRegion(number, country)) {
                 // We should only go ahead if it is a mobile number, or if we can't tell wether it is a mobile number
                 PhoneNumberUtil.PhoneNumberType type = phoneUtil.getNumberType(number);
-                if (type == PhoneNumberUtil.PhoneNumberType.MOBILE || type == PhoneNumberUtil.PhoneNumberType.UNKNOWN)
+                if (type == PhoneNumberUtil.PhoneNumberType.MOBILE ||
+                        type == PhoneNumberUtil.PhoneNumberType.FIXED_LINE_OR_MOBILE ||
+                        type == PhoneNumberUtil.PhoneNumberType.UNKNOWN)
                     return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
                 else
                     throw new InvalidPhoneNumberException();
