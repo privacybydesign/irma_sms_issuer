@@ -35,7 +35,7 @@ $(function() {
         onlyCountries: [
             'at', 'be', 'bg', 'cy', 'dk', 'de', 'ee', 'fi', 'fr', 'gr', 'hu', 'ie',
             'is', 'it', 'hr', 'lv', 'lt', 'li', 'lu', 'mt', 'mc', 'nl', 'no', 'at',
-            'pl', 'pt', 'ro', 'si', 'sk', 'es', 'cz', 'uk', 'se', 'ch'
+            'pl', 'pt', 'ro', 'si', 'sk', 'es', 'cz', 'gb', 'se', 'ch'
         ],
         utilsScript: 'telwidget/js/utils.js'
     });

@@ -52,7 +52,7 @@ public class SMSRestApi {
     static private final String[] countries = {
             "AT", "BE", "BG", "CY", "DK", "DE", "EE", "FI", "FR", "GR", "HU", "IE",
             "IS", "IT", "HR", "LV", "LT", "LI", "LU", "MT", "MC", "NL", "NO", "AT",
-            "PL", "PT", "RO", "SI", "SK", "ES", "CZ", "UK", "SE", "CH"
+            "PL", "PT", "RO", "SI", "SK", "ES", "CZ", "GB", "SE", "CH"
     };
 
     public SMSRestApi() {
