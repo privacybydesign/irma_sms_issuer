@@ -1,0 +1,33 @@
+stages:
+  - build
+  
+before_script:
+  - set -euxo pipefail
+
+build-webapp:
+  image: privacybydesign/node_yarn:latest
+  stage: build
+  script:
+    - cd webapp
+    - yarn install
+    - cd ..
+    - mkdir -p artifacts/webapp
+    - ./webapp/build.sh en
+    - mv webapp/build artifacts/webapp/en
+    - ./webapp/build.sh nl
+    - mv webapp/build artifacts/webapp/nl
+  artifacts:
+    paths:
+      - artifacts/webapp
+
+build-war:
+  image: privacybydesign/jdk8:latest
+  stage: build
+  script:
+    - mkdir artifacts
+    - gradle clean
+    - gradle build
+    - mv build/libs/irma_sms_issuer-1.0.war ./irma_sms_issuer-1.0.war
+  artifacts:
+    paths:
+      - irma_sms_issuer-1.0.war

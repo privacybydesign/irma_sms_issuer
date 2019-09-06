@@ -4,3 +4,6 @@ src/main/resources/config.json
 *.der
 *.pem
 id_rsa*
+webapp/node_modules
+webapp/build
+artifacts

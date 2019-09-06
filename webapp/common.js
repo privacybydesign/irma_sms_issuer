@@ -1,7 +1,5 @@
 'use strict';
 
-var API_ENDPOINT = '/tomcat/irma_sms_issuer/api/';
-
 // This var is global, as we need it to verify a phone number.
 var phone;
 
@@ -37,7 +35,7 @@ $(function() {
             'is', 'it', 'hr', 'lv', 'lt', 'li', 'lu', 'mt', 'mc', 'nl', 'no', 'at',
             'pl', 'pt', 'ro', 'si', 'sk', 'es', 'cz', 'gb', 'se', 'ch'
         ],
-        utilsScript: 'telwidget/js/utils.js'
+        utilsScript: 'assets/telwidget/js/utils.js'
     });
 });
 
@@ -91,7 +89,7 @@ function onSubmitPhone(e) {
 
     phone = $("#phone").intlTelInput("getNumber");
     setStatus('info', MESSAGES['sending-sms']);
-    $.post(API_ENDPOINT + 'send', {phone: phone, language: MESSAGES['lang']})
+    $.post(CONF.API_ENDPOINT + 'send', {phone: phone, language: MESSAGES['lang']})
         .done(function(e) {
             console.log('sent SMS:', e);
             var parts = e.split(':');
@@ -141,25 +139,28 @@ function onSubmitToken(e) {
     e.preventDefault();
     var token = $('#token-form input[type=text]').val().trim().toUpperCase();
     setStatus('info', MESSAGES['verifying-token']);
-    $.post(API_ENDPOINT + 'verify', {phone: phone, token: token})
+    $.post(CONF.API_ENDPOINT + 'verify', {phone: phone, token: token})
         .done(function(jwt) {
             console.log('received JWT:', jwt);
             setStatus('info', MESSAGES['issuing-credential']);
-            IRMA.issue(jwt, function(e) {
-                setStatus('success', MESSAGES['phone-add-success'])
-                console.log('phone added:', e)
-            }, function(e) {
-                console.warn('cancelled:', e);
-                // TODO: don't interpret these strings, use error codes instead.
-                if (e === 'Session timeout, please try again') {
-                    setStatus('info', MESSAGES['phone-add-timeout'])
-                } else { // e === 'User cancelled authentication'
-                    setStatus('info', MESSAGES['phone-add-cancel'])
+            IRMA.startSession(CONF.IRMASERVER, jwt, "publickey")
+                .then(({ sessionPtr, token }) => irma.handleSession(sessionPtr, {server: CONF.IRMASERVER, token}))
+                .then((e) => {
+                    setStatus('success', MESSAGES['phone-add-success']);
+                    console.log('phone added:', e);
                 }
-            }, function(e) {
-                setStatus('danger', MESSAGES['phone-add-error'])
-                console.error('error:', e);
-            })
+                .catch((e) => {
+                    if (e === irma.SessionStatus.Cancelled) {
+                        console.warn('cancelled:', e);
+                        setStatus('info', MESSAGES['phone-add-cancel']);
+                    } else if (e === irma.SessionStatus.Timeout) {
+                        console.warn('cancelled:', e);
+                        setStatus('info', MESSAGES['phone-add-timeout']);
+                    } else {
+                        setStatus('danger', MESSAGES['phone-add-error']);
+                        console.error('error:', e);
+                    }
+                });
         })
         .fail(function(e) {
             var errormsg = e.responseText;
