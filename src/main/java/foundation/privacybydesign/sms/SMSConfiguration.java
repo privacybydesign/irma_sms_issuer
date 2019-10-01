@@ -6,6 +6,8 @@ import org.irmacard.api.common.util.GsonUtil;
 
 import java.io.IOException;
 import java.util.Map;
+import java.security.KeyManagementException;
+import java.security.PrivateKey;
 
 /**
  * Configuration manager. The config itself is stored in config.json, which
@@ -14,6 +16,9 @@ import java.util.Map;
 public class SMSConfiguration extends BaseConfiguration {
     static SMSConfiguration instance;
     static final String CONFIG_FILENAME = "config.json";
+    static {
+        BaseConfiguration.confDirName = "irma_sms_issuer";
+    }
 
     private String sms_sender_backend = "";
     private String sms_sender_ssh_host = "";
@@ -90,5 +95,9 @@ public class SMSConfiguration extends BaseConfiguration {
     public String getSMSAttribute() { return sms_attribute; }
 
     public SignatureAlgorithm getJwtAlgorithm() { return SignatureAlgorithm.RS256; }
+
+    public PrivateKey getPrivateKey() throws KeyManagementException {
+        return BaseConfiguration.getPrivateKey("sk.der");
+    }
 }
 

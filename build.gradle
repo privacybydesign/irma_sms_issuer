@@ -32,7 +32,7 @@ dependencies {
     compile 'com.jcraft:jsch:0.1.53'
 
     compile 'org.irmacard.api:irma_api_common:0.7.7'
-    compile 'foundation.privacybydesign.common:irma_server_common:0.2.1'
+    compile 'foundation.privacybydesign.common:irma_server_common:0.3.2'
 
     compile 'com.googlecode.libphonenumber:libphonenumber:8.9.10'
 
