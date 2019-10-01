@@ -143,7 +143,7 @@ function onSubmitToken(e) {
         .done(function(jwt) {
             console.log('received JWT:', jwt);
             setStatus('info', MESSAGES['issuing-credential']);
-            IRMA.startSession(CONF.IRMASERVER, jwt, "publickey")
+            irma.startSession(CONF.IRMASERVER, jwt, "publickey")
                 .then(({ sessionPtr, token }) => irma.handleSession(sessionPtr, {server: CONF.IRMASERVER, token}))
                 .then((e) => {
                     setStatus('success', MESSAGES['phone-add-success']);
