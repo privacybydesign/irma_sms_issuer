@@ -10,6 +10,7 @@ import javax.ws.rs.InternalServerErrorException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URI;
 
 /**
  * Send a SMS token to a phone using REST, over a SSH tunnel.
@@ -29,7 +30,7 @@ public class SSHTunnelRESTSender extends Sender {
             // Unfortunately, JSch doesn't support ed25519 keys.
             // https://sourceforge.net/p/jsch/feature-requests/7/
 
-            URL sshkey = SSHTunnelRESTSender.class.getClassLoader().getResource(conf.getSMSSenderKeyPath());
+            URI sshkey = conf.getConfigurationDirectory().resolve(conf.getSMSSenderKeyPath());
             if (sshkey == null) {
                 throw new IOException("SSH private key not found");
             }
