@@ -148,7 +148,7 @@ function onSubmitToken(e) {
                 .then((e) => {
                     setStatus('success', MESSAGES['phone-add-success']);
                     console.log('phone added:', e);
-                }
+                })
                 .catch((e) => {
                     if (e === irma.SessionStatus.Cancelled) {
                         console.warn('cancelled:', e);

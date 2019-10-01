@@ -9,8 +9,8 @@ cd "$(dirname "$0")"
 mkdir -p ./build
 mkdir -p ./build/assets
 
-cp ./$0/index.html ./build/
-cp ./$0/messages.js ./build/assets/
+cp ./$1/index.html ./build/
+cp ./$1/messages.js ./build/assets/
 cp -r ./telwidget ./build/assets/
 cp ./common.css ./common.js ./build/assets
 cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./build/assets/
