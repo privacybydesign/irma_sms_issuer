@@ -167,7 +167,8 @@ input[type="tel"] {
 }
 
 .intl-tel-input {
-  display: table-cell;
+  display: block;
+  width: 100%;
 }
 
 .flag-container {
