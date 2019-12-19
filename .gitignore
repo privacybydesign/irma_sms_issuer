@@ -7,3 +7,4 @@ id_rsa*
 webapp/node_modules
 webapp/build
 artifacts
+.idea/
