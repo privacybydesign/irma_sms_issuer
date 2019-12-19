@@ -1,3 +1,154 @@
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./fonts/subset-Montserrat-Regular.woff2') format('woff2'),
+  url('./fonts/subset-Montserrat-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Karla';
+  src: url('./fonts/subset-Karla-Bold.woff2') format('woff2'),
+  url('./fonts/subset-Karla-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./fonts/subset-Montserrat-SemiBold.woff2') format('woff2'),
+  url('./fonts/subset-Montserrat-SemiBold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-size: 16px;
+  line-height: 24px;
+  background-color: #F2F5F8;
+  font-family: 'Montserrat', Verdana, Arial, sans-serif;
+}
+
+a {
+  color: #004C92;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+header h1 {
+  display: block;
+  margin: 0;
+  background-color: #DFE6EE;
+  color: #3C4B5A;
+  font-size: 18px;
+  line-height: 22px;
+  padding: 16px;
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Karla', Verdana, Arial, sans-serif;
+}
+
+main {
+  padding: 16px;
+  line-height: 24px;
+  font-size: 16px;
+  color: #15222E;
+  max-width: 600px;
+  margin: auto;
+}
+
+#status {
+  max-width: 600px;
+  margin: auto;
+  padding: 16px;
+  color: white;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
+}
+
+.alert-info {
+  background-color: #004c92;
+}
+
+.alert-danger {
+  background-color: #d44454;
+}
+
+.alert-success {
+  background-color: #079268;
+}
+
+main {
+  flex: 1;
+}
+
+label {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: bold;
+  color: #3C4B5A;
+}
+
+input {
+  height: 32px;
+  display: block;
+  border: none;
+  border-bottom: 2px solid #004C92;
+  width: 100%;
+  font-size: 16px;
+  line-height: 24px;
+  background-color: transparent;
+  font-family: 'Montserrat', Verdana, Arial, sans-serif;
+}
+
+footer {
+  background-color: #DFE6EE;
+  padding: 16px;
+}
+
+footer .actions {
+  max-width: 600px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+footer a, button {
+  display: inline-block;
+  padding: 14px 34px;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 28px;
+}
+
+footer a {
+  text-decoration: none;
+  color: #004C92;
+}
+
+button {
+  margin-top: 1rem;
+  background-color: #004C92;
+  color: white;
+  border: none;
+  font-family: 'Montserrat', Verdana, Arial, sans-serif;
+}
+
 .iti-flag {background-image: url("telwidget/img/flags.png");}
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2),
