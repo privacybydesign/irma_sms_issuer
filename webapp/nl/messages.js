@@ -2,8 +2,7 @@
 
 var MESSAGES = {
     'lang': 'nl',
-    'sending-sms': 'SMS code wordt verstuurd...',
-    'sms-sent': 'Code is verstuurd! U krijgt een bericht van <strong>%number%</strong>.',
+    'sending-sms': 'SMS-bericht wordt verstuurd...',
     'verifying-token': 'Code wordt geverifieerd...',
     'issuing-credential': 'Attribuut uitgeven...',
     'second': '%n% seconde',

@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Adding a mobile phone number attribute</title>
+  <title>Adding a mobile phone number</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="assets/telwidget/css/intlTelInput.min.css">
   <link rel="stylesheet" href="assets/common.css">
@@ -20,32 +20,30 @@
   </header>
   <main>
     <div id="status" class="alert hidden" role="alert"></div>
-    <p>On this page you can add a (European) mobile telephone number as a new attribute to your IRMA app. This can be
-      done multiple times, for different numbers. It works via the following three steps.</p>
-    <ol>
-      <li>Fill in your phone number below, and
-        click the 'Send SMS' button. (Please either select your country, or include your
-        <a href="https://en.wikipedia.org/wiki/List_of_country_calling_codes">country code</a>.)
-      </li>
-      <li>A text message will then be sent (free of charge) to this
-        number with a verfication code. Enter this
-        code below.
-      </li>
-      <li>Scan the resulting QR-code with your
-        IRMA-app, and follow the instructions in
-        the app.
-      </li>
-    </ol>
-    <form id="phone-form">
-      <label for="phone">Phone number</label>
-      <input required id="phone" name="phone" class="form-control" type="tel">
-      <button type="submit">
-        Send SMS
-      </button>
-    </form>
+
+    <div id="block-phone">
+      <p>On this page you can add a (European) mobile telephone number to your IRMA app. This can be
+        done multiple times, for different numbers.</p>
+      <form id="phone-form">
+        <label for="phone">Fill in your phone number</label>
+        <input required id="phone" name="phone" class="form-control" type="tel">
+        <button type="submit">
+          Send SMS
+        </button>
+      </form>
+    </div>
+
     <div id="block-token" style="display: none">
-      <p>An SMS with a verification code has been sent to you. Please enter the verification code here.</p>
+      <p>We have sent a SMS message to you. Please go through the following steps:</p>
+      <ol>
+        <li>Open the SMS message sent by 06-51953392.</li>
+        <li>Choose the link in the SMS message.</li>
+        <li>You will be forwarded back to the IRMA app.</li>
+      </ol>
+      <p>In case you don't visit this web page using your mobile phone,
+        fill in the verification code from the SMS message below.</p>
       <form id="token-form">
+        <label for="phone">Verification code</label>
         <input type="text" required class="form-control"
                pattern="[0-9A-Za-z]{6}"
                style="text-transform: uppercase" />
@@ -57,7 +55,7 @@
   </main>
   <footer>
     <div class="actions">
-      <a href="https://privacybydesign.foundation/issuance/">Back</a>
+      <a href="https://privacybydesign.foundation/issuance/">Add other personal data to IRMA</a>
     </div>
   </footer>
 </div>

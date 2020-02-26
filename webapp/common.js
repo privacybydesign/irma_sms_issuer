@@ -92,10 +92,8 @@ function onSubmitPhone(e) {
     $.post(CONF.API_ENDPOINT + 'send', {phone: phone, language: MESSAGES['lang']})
         .done(function(e) {
             console.log('sent SMS:', e);
-            var parts = e.split(':');
-            // parts[0] should be 'OK'
-            var senderNumber = parts[1];
-            setStatus('info', MESSAGES['sms-sent'].replace('%number%', senderNumber));
+            clearStatus();
+            $('#block-phone').hide();
             $('#block-token').show();
         })
         .fail(function(e) {
@@ -170,6 +168,10 @@ function onSubmitToken(e) {
             }
             setStatus('danger', MESSAGES[errormsg]);
         });
+}
+
+function clearStatus() {
+    $('#status').addClass('hidden');
 }
 
 // copied from irma_email_issuer
