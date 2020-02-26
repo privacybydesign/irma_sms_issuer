@@ -7,6 +7,9 @@ $(function() {
     $('#phone-form').on('submit', onSubmitPhone);
     $('#token-form').on('submit', onSubmitToken);
 
+    if (location.href.includes('?inapp=true'))
+        $('#back-button').addClass('button-hidden');
+
     // Is this a link from a SMS message?
     if (document.location.hash.substr(0, '#!verify:'.length) == '#!verify:') {
         verifyTokenFromURL();

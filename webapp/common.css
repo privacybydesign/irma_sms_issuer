@@ -76,6 +76,10 @@ main {
   display: none;
 }
 
+.button-hidden {
+  visibility: hidden;
+}
+
 .alert-info {
   background-color: #004c92;
 }
