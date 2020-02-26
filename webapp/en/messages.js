@@ -3,7 +3,6 @@
 var MESSAGES = {
     'lang': 'en',
     'sending-sms': 'SMS message is being sent...',
-    'sms-sent': 'Code has been sent! You will receive a message from number <strong>%number%</strong>.',
     'verifying-token': 'Code is being verified ...',
     'issuing-credential': 'Attribute has been issed ...',
     'second': '%n% seconds',

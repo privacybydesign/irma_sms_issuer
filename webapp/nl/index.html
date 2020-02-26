@@ -20,29 +20,29 @@
   </header>
   <main>
     <div id="status" class="alert hidden" role="alert"></div>
-    <p>Op deze pagina kunt u een (Europees) mobiel telefoonnummer als attribuut toevoegen aan uw IRMA app. Dit kan
-      meerdere malen gedaan worden, voor verschillende nummers. Het werkt via de volgende drie stappen.</p>
-    <ol>
-      <li>Vul uw mobiele telefoonnummer hieronder in, en klik op de
-        knop 'Verstuur SMS'. (Selecteer uw land of voer uw <a
-            href="https://nl.wikipedia.org/wiki/Lijst_van_landnummers_in_de_telefonie">landnummer</a> in.)
-      </li>
-      <li>Naar het nummer dat u opgeeft wordt (kosteloos) een
-        SMS bericht met een verificatiecode gestuurd. Vul deze
-        code hier beneden in.
-      </li>
-      <li>Scan de QR-code die verschijnt met uw IRMA-app en volg de instructies in de app.</li>
-    </ol>
-    <form id="phone-form">
-      <label for="phone">Telefoonnummer</label>
-      <input required id="phone" name="phone" class="form-control" type="tel">
-      <button type="submit">
-        Verstuur SMS
-      </button>
-    </form>
+
+    <div id="block-phone">
+      <p>Op deze pagina kun je een (Europees) mobiel telefoonnummer toevoegen aan uw IRMA app. Dit kan
+        meerdere malen gedaan worden, voor verschillende nummers.</p>
+      <form id="phone-form">
+        <label for="phone">Vul je telefoonnummer in</label>
+        <input required id="phone" name="phone" class="form-control" type="tel">
+        <button type="submit">
+          Voeg toe
+        </button>
+      </form>
+    </div>
+
     <div id="block-token" style="display: none">
-      <p>U heeft een SMS bericht met een verificatiecode toegestuurd gekregen. Vul deze code hieronder in:</p>
+      <p>We hebben een SMS-bericht naar je verstuurd. Doorloop de volgende stappen:</p>
+      <ol>
+        <li>Open het SMS-bericht afkomstig van 06-51953392.</li>
+        <li>Kies de link in het SMS-bericht.</li>
+        <li>Je wordt teruggestuurd naar de IRMA-app.</li>
+      </ol>
+      <p>Bekijk je deze pagina niet op je mobiel? Vul hieronder de verificatiecode uit het SMS-bericht in.</p>
       <form id="token-form">
+        <label for="phone">Verificatiecode</label>
         <input type="text" required class="form-control"
                pattern="[0-9A-Za-z]{6}"
                style="text-transform: uppercase" />
@@ -54,7 +54,7 @@
   </main>
   <footer>
     <div class="actions">
-      <a href="https://privacybydesign.foundation/issuance/">Terug</a>
+      <a href="https://privacybydesign.foundation/uitgifte/">Andere gegevens toevoegen aan IRMA</a>
     </div>
   </footer>
 </div>
