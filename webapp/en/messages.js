@@ -22,5 +22,6 @@ var MESSAGES = {
     'error:sending-sms': 'Sending the SMS message fails. Most likely this is problem in the IRMA system. Please contact IRMA if this happens more often.',
     'error:ratelimit': 'Please try again in %time%.',
     'error:cannot-validate-token': 'The code cannot be verified. Is there a typo?',
+    'issuers-overview-page': 'https://privacybydesign.foundation/issuance/',
 };
 
