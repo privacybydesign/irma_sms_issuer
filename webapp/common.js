@@ -6,9 +6,7 @@ var phone;
 $(function() {
     $('#phone-form').on('submit', onSubmitPhone);
     $('#token-form').on('submit', onSubmitToken);
-
-    if (location.href.includes('?inapp=true'))
-        $('#back-button').addClass('button-hidden');
+    setWindow('phone');
 
     // Is this a link from a SMS message?
     if (document.location.hash.substr(0, '#!verify:'.length) == '#!verify:') {
@@ -41,6 +39,34 @@ $(function() {
         utilsScript: 'assets/telwidget/js/utils.js'
     });
 });
+
+function setWindow(window, back) {
+    $('[id^=block-]').hide();
+    $('#block-'+window).show();
+    $('#submit-button').text(MESSAGES['button-' + window]);
+
+    const backButton = $('#back-button');
+    backButton.off();
+    if (back) {
+        backButton
+          .click(() => {setWindow(back); return false;})
+          .removeClass('button-hidden');
+    } else if (location.href.includes('?inapp=true')) {
+        backButton.addClass('button-hidden');
+    }
+
+    const submitButton = $('#submit-button');
+    submitButton.off();
+    switch (window) {
+        case 'phone':
+        case 'confirm':
+            submitButton.click(() => $('#submit-phone').click());
+            break;
+        case 'token':
+            submitButton.click(() => $('#submit-token').click());
+            break;
+    }
+}
 
 function validateInput() {
     var telInput = $('#phone');
@@ -87,20 +113,23 @@ function verifyTokenFromURL() {
 function onSubmitPhone(e) {
     e.preventDefault();
 
-    // Disable first field
-    $('#phone-form input').prop('disabled', true);
-
     phone = $("#phone").intlTelInput("getNumber");
+
+    if ($('#block-confirm').is(':hidden')) {
+        $('#phone-confirm').text(phone);
+        setWindow('confirm', 'phone');
+        return;
+    }
+
     setStatus('info', MESSAGES['sending-sms']);
     $.post(CONF.API_ENDPOINT + 'send', {phone: phone, language: MESSAGES['lang']})
         .done(function(e) {
             console.log('sent SMS:', e);
             clearStatus();
-            $('#block-phone').hide();
-            $('#block-token').show();
+            setWindow('token');
         })
         .fail(function(e) {
-            $('#phone-form input').prop('disabled', false);
+            setWindow('phone');
             var errormsg = e.responseText;
             console.error('failed to submit phone number:', errormsg);
             if (!errormsg || errormsg.substr(0, 6) != 'error:') {
