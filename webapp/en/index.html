@@ -16,7 +16,7 @@
 <body>
 <div class="container">
   <header>
-    <h1>Adding a mobile phone number attribute</h1>
+    <h1>Adding a mobile phone number</h1>
   </header>
   <main>
     <div id="status" class="alert hidden" role="alert"></div>
@@ -27,10 +27,13 @@
       <form id="phone-form">
         <label for="phone">Fill in your phone number</label>
         <input required id="phone" name="phone" class="form-control" type="tel">
-        <button type="submit">
-          Send SMS
-        </button>
+        <button class="hidden" id="submit-phone" type="submit"></button>
       </form>
+    </div>
+
+    <div id="block-confirm" style="display: none">
+      <p>Please check your phone number again for correctness.</p>
+      <p class="alert alert-info" id="phone-confirm"></p>
     </div>
 
     <div id="block-token" style="display: none">
@@ -47,15 +50,14 @@
         <input type="text" required class="form-control"
                pattern="[0-9A-Za-z]{6}"
                style="text-transform: uppercase" />
-        <button type="button">
-          Verify
-        </button>
+        <button class="hidden" id="submit-token" type="button"></button>
       </form>
     </div>
   </main>
   <footer>
     <div class="actions">
       <a id="back-button" href="https://privacybydesign.foundation/issuance/">Back</a>
+      <button id="submit-button"></button>
     </div>
   </footer>
 </div>

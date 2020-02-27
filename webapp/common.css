@@ -64,6 +64,15 @@ main {
   margin: auto;
 }
 
+#phone-confirm {
+  max-width: 600px;
+  margin: auto;
+  padding: 16px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
 #status {
   max-width: 600px;
   margin: auto;
@@ -145,8 +154,7 @@ footer a {
   color: #004C92;
 }
 
-button {
-  margin-top: 1rem;
+footer button {
   background-color: #004C92;
   color: white;
   border: none;
