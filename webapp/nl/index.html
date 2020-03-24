@@ -15,29 +15,38 @@
 </head>
 <body>
 <div class="container">
-  <header>
-    <h1>Telefoonnummer toevoegen</h1>
-  </header>
+  <header></header>
+  <div id="status-bar" class="alert hidden" role="alert">
+    <div class="status-container">
+      <div id="status"></div>
+    </div>
+  </div>
   <main>
-    <div id="status" class="alert hidden" role="alert"></div>
-
     <div id="block-phone">
-      <p>Zet je telefoonnummer in je IRMA-app.</p>
-      <p>Wil je meerdere telefoonnummers toevoegen? Doorloop deze stappen dan voor elke telefoonnummer dat je wilt toevoegen.</p>
+      <h1>Telefoonnummer toevoegen</h1>
+      <p>Zet je telefoonnummer in je IRMA app.</p>
+      <p>
+        Wil je meerdere telefoonnummers toevoegen?
+        Doorloop deze stappen dan voor elk telefoonnummer dat je wilt toevoegen.
+      </p>
       <form id="phone-form">
-        <label for="phone">Vul je telefoonnummer in</label>
+        <label for="phone">Mobiele telefoonnummer</label>
         <input required id="phone" name="phone" class="form-control" type="tel">
         <button class="hidden" id="submit-phone" type="submit"></button>
       </form>
     </div>
 
     <div id="block-confirm" style="display: none">
-      <p>Controleer het mobiele telefoonnummer nogmaals ter bevestiging.</p>
-      <p class="alert alert-info" id="phone-confirm"></p>
+      <h1>Telefoonnummer controleren</h1>
+      <p>Controleer het telefoonnummer nogmaals ter bevestiging. Kies 'Terug' om je telefoonnummer te corrigeren.</p>
+      <label for="phone-confirm">Mobiele telefoonnummer</label>
+      <div class="confirm-container"><input disabled id="phone-confirm" type="tel"></div>
     </div>
 
     <div id="block-token" style="display: none">
-      <p>We hebben een SMS-bericht naar je verstuurd. Doorloop de volgende stappen:</p>
+      <h1>Telefoonnummer toevoegen</h1>
+      <p>Je ontvangt een SMS van 06-51953392.</p>
+      <b>Doorloop de volgende stappen:</b>
       <ol>
         <li>Open het SMS-bericht afkomstig van 06-51953392.</li>
         <li>Kies de link in het SMS-bericht.</li>
@@ -45,7 +54,7 @@
       </ol>
       <p>Bekijk je deze pagina niet op je mobiel? Vul hieronder de verificatiecode uit het SMS-bericht in.</p>
       <form id="token-form">
-        <label for="phone">Verificatiecode</label>
+        <label for="submit-token">Verificatiecode</label>
         <input type="text" required class="form-control"
                pattern="[0-9A-Za-z]{6}"
                style="text-transform: uppercase" />

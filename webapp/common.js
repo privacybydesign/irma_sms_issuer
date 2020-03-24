@@ -3,6 +3,8 @@
 // This var is global, as we need it to verify a phone number.
 var phone;
 
+const isMobile = navigator.userAgent.includes('Mobile/');
+
 $(function() {
     $('#phone-form').on('submit', onSubmitPhone);
     $('#token-form').on('submit', onSubmitToken);
@@ -38,6 +40,11 @@ $(function() {
         ],
         utilsScript: 'assets/telwidget/js/utils.js'
     });
+    $('#phone-confirm').intlTelInput({
+        initialCountry: 'nl',
+        allowDropdown: false,
+        utilsScript: 'assets/telwidget/js/utils.js'
+    });
 });
 
 function setWindow(window, back) {
@@ -45,16 +52,26 @@ function setWindow(window, back) {
     $('#block-'+window).show();
     $('#submit-button').text(MESSAGES['button-' + window]);
 
+    // Put h1 in header when not being on mobile
+    const h1 = $('#block-'+window + ' h1');
+    if (isMobile) {
+        $('header').hide();
+        h1.show();
+    } else {
+        $('header').html(h1.clone().show()).show();
+        h1.hide();
+    }
+
     const backButton = $('#back-button');
     backButton.off();
     if (back) {
         backButton
-          .click(() => {setWindow(back); return false;})
+          .click(() => {clearStatus(); setWindow(back); return false;})
           .removeAttr('href')
           .removeClass('button-hidden');
     } else {
         backButton.attr('href', MESSAGES['issuers-overview-page']);
-        if (navigator.userAgent.includes('Mobile/'))
+        if (isMobile)
             backButton.addClass('button-hidden');
     }
 
@@ -116,10 +133,13 @@ function verifyTokenFromURL() {
 function onSubmitPhone(e) {
     e.preventDefault();
 
-    phone = $("#phone").intlTelInput("getNumber");
+    var phoneInput = $('#phone');
+    phone = phoneInput.intlTelInput("getNumber");
+    var country = phoneInput.intlTelInput("getSelectedCountryData");
 
     if ($('#block-confirm').is(':hidden')) {
-        $('#phone-confirm').text(phone);
+        $('#phone-confirm').intlTelInput("setNumber", phone);
+        $('#phone-confirm').intlTelInput("setCountry", country.iso2);
         setWindow('confirm', 'phone');
         return;
     }
@@ -128,8 +148,8 @@ function onSubmitPhone(e) {
     $.post(CONF.API_ENDPOINT + 'send', {phone: phone, language: MESSAGES['lang']})
         .done(function(e) {
             console.log('sent SMS:', e);
-            clearStatus();
-            setWindow('token');
+            setStatus('success', MESSAGES['sms-sent']);
+            setWindow('token', 'phone');
         })
         .fail(function(e) {
             setWindow('phone');
@@ -206,17 +226,17 @@ function onSubmitToken(e) {
 }
 
 function clearStatus() {
-    $('#status').addClass('hidden');
+    $('#status-bar').addClass('hidden');
 }
 
 // copied from irma_email_issuer
 function setStatus(alertType, message) {
-    $('#status')
+    $('#status').html(message);
+    $('#status-bar')
         .removeClass('alert-success')
         .removeClass('alert-info')
         .removeClass('alert-warning')
         .removeClass('alert-danger')
         .addClass('alert-'+alertType)
-        .html(message)
         .removeClass('hidden');
 }

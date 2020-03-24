@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Adding a mobile phone number</title>
+  <title>Adding a phone number</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="assets/telwidget/css/intlTelInput.min.css">
   <link rel="stylesheet" href="assets/common.css">
@@ -15,29 +15,41 @@
 </head>
 <body>
 <div class="container">
-  <header>
-    <h1>Adding a mobile phone number</h1>
-  </header>
+  <header></header>
+  <div id="status-bar" class="alert hidden" role="alert">
+    <div class="status-container">
+      <div id="status"></div>
+    </div>
+  </div>
   <main>
-    <div id="status" class="alert hidden" role="alert"></div>
-
     <div id="block-phone">
-      <p>On this page you can add a (European) mobile telephone number to your IRMA app. This can be
-        done multiple times, for different numbers.</p>
+      <h1>Adding a phone number</h1>
+      <p>On this page you can add a (European) mobile telephone number to your IRMA app.</p>
+      <p>
+        Do you want to add multiple phone numbers to your IRMA app?
+        Then perform these steps multiple times.
+      </p>
       <form id="phone-form">
-        <label for="phone">Fill in your phone number</label>
+        <label for="phone">Mobile phone number</label>
         <input required id="phone" name="phone" class="form-control" type="tel">
         <button class="hidden" id="submit-phone" type="submit"></button>
       </form>
     </div>
 
     <div id="block-confirm" style="display: none">
-      <p>Please check your phone number again for correctness.</p>
-      <p class="alert alert-info" id="phone-confirm"></p>
+      <h1>Check your phone number</h1>
+      <p>
+        Please check your phone number again for correctness.
+        Choose 'Back' to correct your phone number.
+      </p>
+      <label for="phone-confirm">Mobile phone number</label>
+      <div class="confirm-container"><input disabled id="phone-confirm" type="tel"></div>
     </div>
 
     <div id="block-token" style="display: none">
-      <p>We have sent a SMS message to you. Please go through the following steps:</p>
+      <h1>Adding a phone number</h1>
+      <p>You receive a SMS from 06-51953392.</p>
+      <b>Please go through the following steps:</b>
       <ol>
         <li>Open the SMS message sent by 06-51953392.</li>
         <li>Choose the link in the SMS message.</li>
@@ -46,7 +58,7 @@
       <p>In case you don't visit this web page using your mobile phone,
         fill in the verification code from the SMS message below.</p>
       <form id="token-form">
-        <label for="phone">Verification code</label>
+        <label for="submit-token">Verification code</label>
         <input type="text" required class="form-control"
                pattern="[0-9A-Za-z]{6}"
                style="text-transform: uppercase" />

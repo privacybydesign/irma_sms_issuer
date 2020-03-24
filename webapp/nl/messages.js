@@ -3,6 +3,7 @@
 var MESSAGES = {
     'lang': 'nl',
     'sending-sms': 'SMS-bericht wordt verstuurd...',
+    'sms-sent': 'SMS-bericht is verstuurd.',
     'verifying-token': 'Code wordt geverifieerd...',
     'issuing-credential': 'Attribuut uitgeven...',
     'button-phone': 'Voeg toe',

@@ -3,8 +3,9 @@
 var MESSAGES = {
     'lang': 'en',
     'sending-sms': 'SMS message is being sent...',
+    'sms-sent': 'SMS message has been sent.',
     'verifying-token': 'Code is being verified ...',
-    'issuing-credential': 'Attribute has been issed ...',
+    'issuing-credential': 'Attribute has been issued ...',
     'button-phone': 'Add',
     'button-confirm': 'Confirm',
     'button-token': 'Verify',
