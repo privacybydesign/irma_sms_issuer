@@ -20,8 +20,8 @@ var MESSAGES = {
     'phone-add-cancel': 'Geannuleerd.',
     'phone-add-error': 'Het is helaas niet gelukt dit telefoonnummer toe te voegen aan de IRMA app.',
     'error:internal': 'Interne fout. Neem contact op met IRMA als dit vaker voorkomt.',
-    'error:sending-sms': 'De SMS kan niet verzonden worden. Dit is waarschijnlijk een probleem in IRMA. Neem contact op met IRMA als dit vaker voorkomt.',
+    'error:sending-sms': 'De SMS kan niet worden verzonden. Dit is waarschijnlijk een probleem in IRMA. Neem contact op met IRMA als dit vaker voorkomt.',
     'error:ratelimit': 'Probeer het opnieuw over %time%.',
-    'error:cannot-validate-token': 'De code niet geverifieerd worden. Zit er geen typfout in?',
+    'error:cannot-validate-token': 'De code kon niet worden geverifieerd. Zit er geen typfout in?',
     'issuers-overview-page': 'https://privacybydesign.foundation/uitgifte/',
 };
