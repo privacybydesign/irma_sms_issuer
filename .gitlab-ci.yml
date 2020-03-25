@@ -17,6 +17,8 @@ build-webapp:
     - ./webapp/build.sh nl
     - mv webapp/build artifacts/webapp/nl
   artifacts:
+    # Disabling artifact expiry is not supported yet, so make
+    expire_in: 100 year
     paths:
       - artifacts/webapp
 
@@ -29,5 +31,7 @@ build-war:
     - gradle build
     - mv build/libs/irma_sms_issuer-1.0.war ./irma_sms_issuer-1.0.war
   artifacts:
+    # Disabling artifact expiry is not supported yet, so make
+    expire_in: 100 year
     paths:
       - irma_sms_issuer-1.0.war
