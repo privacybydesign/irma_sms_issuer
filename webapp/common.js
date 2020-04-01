@@ -3,7 +3,7 @@
 // This var is global, as we need it to verify a phone number.
 var phone;
 
-const isMobile = navigator.userAgent.includes('Mobile/');
+const isInApp = location.href.includes('?inapp=true');
 
 $(function() {
     $('#phone-form').on('submit', onSubmitPhone);
@@ -54,7 +54,7 @@ function setWindow(window, back) {
 
     // Put h1 in header when not being on mobile
     const h1 = $('#block-'+window + ' h1');
-    if (isMobile) {
+    if (isInApp) {
         $('header').hide();
         h1.show();
     } else {
@@ -71,7 +71,7 @@ function setWindow(window, back) {
           .removeClass('button-hidden');
     } else {
         backButton.attr('href', MESSAGES['issuers-overview-page']);
-        if (isMobile)
+        if (isInApp)
             backButton.addClass('button-hidden');
     }
 
