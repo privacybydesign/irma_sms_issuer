@@ -93,10 +93,8 @@ function validateInput() {
     telInput.removeClass('error');
     if ($.trim(telInput.val())) {
         if (telInput.intlTelInput('isValidNumber')) {
-            $('input[type=submit]').prop('disabled', false);
+            clearStatus();
         } else {
-            $('input[type=submit]').prop('disabled', true);
-            $('#error-msg').removeClass('hide');
             telInput.addClass('error');
         }
     }
@@ -134,6 +132,12 @@ function onSubmitPhone(e) {
     e.preventDefault();
 
     var phoneInput = $('#phone');
+
+    if (phoneInput.hasClass('error')) {
+        setStatus('warning', MESSAGES['warn:phone-number-format']);
+        return;
+    }
+
     phone = phoneInput.intlTelInput("getNumber");
     var country = phoneInput.intlTelInput("getSelectedCountryData");
 
@@ -155,7 +159,7 @@ function onSubmitPhone(e) {
             setWindow('phone');
             var errormsg = e.responseText;
             console.error('failed to submit phone number:', errormsg);
-            if (!errormsg || errormsg.substr(0, 6) != 'error:') {
+            if (!errormsg || !MESSAGES[errormsg]) {
                 errormsg = 'error:internal';
             }
             if (errormsg == 'error:ratelimit') {
