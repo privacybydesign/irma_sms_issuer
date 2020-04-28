@@ -107,6 +107,10 @@ main {
   background-color: #d44454;
 }
 
+.alert-warning {
+  background-color: #f0ad4e;
+}
+
 .alert-success {
   background-color: #079268;
 }
