@@ -23,7 +23,7 @@ $(function() {
 
     var telInput = $('#phone');
     telInput.change(validateInput);
-    telInput.keyup(validateInput);
+    telInput.keypress(validateInput);
     telInput.intlTelInput({
         // geoIpLookup: function(callback) {
         //   $.get('http://ipinfo.io', function() {}, 'jsonp').always(function(resp) {
@@ -90,12 +90,20 @@ function setWindow(window, back) {
 
 function validateInput() {
     var telInput = $('#phone');
-    telInput.removeClass('error');
+    telInput.removeClass(['error', 'invalid', 'not-mobile']);
     if ($.trim(telInput.val())) {
         if (telInput.intlTelInput('isValidNumber')) {
-            clearStatus();
+            var numberType = telInput.intlTelInput('getNumberType');
+            var numberTypes = intlTelInputUtils.numberType;
+            // In some countries there is no distinction between fixed line and mobile.
+            // Therefore check for FIXED_LINE_OR_MOBILE too.
+            if ([numberTypes.MOBILE, numberTypes.FIXED_LINE_OR_MOBILE].includes(numberType)) {
+                clearStatus();
+            } else {
+                telInput.addClass('invalid not-mobile');
+            }
         } else {
-            telInput.addClass('error');
+            telInput.addClass('invalid');
         }
     }
 }
@@ -133,8 +141,10 @@ function onSubmitPhone(e) {
 
     var phoneInput = $('#phone');
 
-    if (phoneInput.hasClass('error')) {
-        setStatus('warning', MESSAGES['warn:phone-number-format']);
+    if (phoneInput.hasClass('invalid')) {
+        phoneInput.addClass('error');
+        setStatus('warning',
+          phoneInput.hasClass('not-mobile') ? MESSAGES['error:address-malformed'] : MESSAGES['error:phone-number-format']);
         return;
     }
 

@@ -19,7 +19,7 @@ var MESSAGES = {
     'phone-add-timeout': 'The session timed out. Please reload this page and try again.',
     'phone-add-cancel': 'Cancelled.',
     'phone-add-error': 'Adding the phone number attribute failed, unfortunately.',
-    'warn:phone-number-format': 'You did not enter a valid telephone number. Please check whether the telephone number is correct. If you are sure your telephone number is correct and this warning keeps emerging, please contact IRMA.',
+    'error:phone-number-format': 'You did not enter a valid telephone number. Please check whether the telephone number is correct.',
     'error:internal': 'Internal error. Please contact IRMA if this happens more often.',
     'error:sending-sms': 'Sending the SMS message fails. Most likely this is problem in the IRMA system. Please contact IRMA if this happens more often.',
     'error:ratelimit': 'Please try again in %time%.',

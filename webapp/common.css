@@ -151,6 +151,15 @@ input {
   font-family: 'Montserrat', Verdana, Arial, sans-serif;
 }
 
+input.error {
+  border-color: #d44454;
+  color: #d44454;
+}
+
+input.error:focus {
+  outline: 2px solid #d44454;
+}
+
 #phone-confirm {
   border-style: none;
 }
