@@ -19,7 +19,7 @@ var MESSAGES = {
     'phone-add-timeout': 'De sessie is verlopen. Herlaad de pagina om het opnieuw te proberen.',
     'phone-add-cancel': 'Geannuleerd.',
     'phone-add-error': 'Het is helaas niet gelukt dit telefoonnummer toe te voegen aan de IRMA app.',
-    'warn:phone-number-format': 'Je hebt geen geldig telefoonnummer ingevoerd. Controleer of het ingevoerde telefoonnummer klopt. Weet je zeker dat het telefoonnummer klopt en deze melding blijft verschijnen? Neem dan contact op met IRMA.',
+    'error:phone-number-format': 'Je hebt geen geldig telefoonnummer ingevoerd. Controleer of het ingevoerde telefoonnummer klopt.',
     'error:internal': 'Interne fout. Neem contact op met IRMA als dit vaker voorkomt.',
     'error:sending-sms': 'De SMS kan niet worden verzonden. Dit is waarschijnlijk een probleem in IRMA. Neem contact op met IRMA als dit vaker voorkomt.',
     'error:ratelimit': 'Probeer het opnieuw over %time%.',
