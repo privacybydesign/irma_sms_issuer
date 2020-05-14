@@ -243,7 +243,6 @@ function clearStatus() {
     $('#status-bar').addClass('hidden');
 }
 
-// copied from irma_email_issuer
 function setStatus(alertType, message) {
     $('#status').html(message);
     $('#status-bar')
@@ -253,4 +252,5 @@ function setStatus(alertType, message) {
         .removeClass('alert-danger')
         .addClass('alert-'+alertType)
         .removeClass('hidden');
+    window.scrollTo(0,0);
 }
