@@ -23,7 +23,7 @@ $(function() {
 
     var telInput = $('#phone');
     telInput.change(validateInput);
-    telInput.keypress(validateInput);
+    telInput.keyup(validateInput);
     telInput.intlTelInput({
         // geoIpLookup: function(callback) {
         //   $.get('http://ipinfo.io', function() {}, 'jsonp').always(function(resp) {
