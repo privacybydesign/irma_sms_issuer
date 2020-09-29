@@ -25,6 +25,5 @@ var MESSAGES = {
     'error:ratelimit': 'Please try again in %time%.',
     'error:cannot-validate-token': 'The code cannot be verified. Is there a typo?',
     'error:address-malformed': 'The telephone number you entered is not supported by us. You can only add (European) mobile telephone numbers.',
-    'issuers-overview-page': 'https://privacybydesign.foundation/issuance/',
 };
 
