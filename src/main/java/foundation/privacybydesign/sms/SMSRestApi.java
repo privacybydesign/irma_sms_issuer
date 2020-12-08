@@ -42,6 +42,8 @@ public class SMSRestApi {
     private static final String ERR_SENDING_SMS = "error:sending-sms";
     private static final String OK_RESPONSE = "OK:"; // prefix for number
 
+    private static final String PROXY_IP_HEADER = "X-Real-IP";
+
     private RateLimit rateLimiter;
     private static final Logger logger = LoggerFactory.getLogger(SMSRestApi.class);
 
@@ -95,7 +97,10 @@ public class SMSRestApi {
         try {
             phone = canonicalPhoneNumber(phone);
 
-            long retryAfter = rateLimiter.rateLimited(req.getRemoteAddr(), phone);
+            String ip = req.getHeader(PROXY_IP_HEADER);
+            if (ip == null)
+                ip = req.getRemoteAddr();
+            long retryAfter = rateLimiter.rateLimited(ip, phone);
             if (retryAfter > 0) {
                 // 429 Too Many Requests
                 // https://tools.ietf.org/html/rfc6585#section-4
