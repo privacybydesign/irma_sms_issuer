@@ -7,7 +7,7 @@
     "build": "./build.sh"
   },
   "dependencies": {
-    "@privacybydesign/irmajs": "^0.1.8",
+    "@privacybydesign/irmajs": "^0.2.2",
     "jquery": "^3.4.1"
   }
 }
