@@ -211,7 +211,11 @@ function onSubmitToken(e) {
             console.log('received JWT:', jwt);
             setStatus('info', MESSAGES['issuing-credential']);
             irma.startSession(CONF.IRMASERVER, jwt, "publickey")
-                .then(({ sessionPtr, token }) => irma.handleSession(sessionPtr, {server: CONF.IRMASERVER, token}))
+                .then(({ sessionPtr, token }) => irma.handleSession(sessionPtr, {
+                    server: CONF.IRMASERVER,
+                    language: MESSAGES['lang'],
+                    token,
+                }))
                 .then((e) => {
                     setStatus('success', MESSAGES['phone-add-success']);
                     console.log('phone added:', e);
