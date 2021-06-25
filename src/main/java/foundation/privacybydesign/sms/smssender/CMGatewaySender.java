@@ -21,7 +21,7 @@ import java.util.TreeMap;
  */
 public class CMGatewaySender extends Sender {
     @Override
-    protected void sendText(String phone, String message) throws IOException {
+    protected void sendMessage(String phone, String message) throws IOException {
         CMGatewayConfiguration conf = SMSConfiguration.getInstance().getCMGatewayConfiguration();
         if (conf == null) {
             throw new IOException("CM gateway configuration not found");

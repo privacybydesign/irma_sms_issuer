@@ -37,7 +37,7 @@ public abstract class RESTSender extends Sender {
     abstract void sendBytes(String phone, byte[] out) throws IOException;
 
     @Override
-    protected void sendText(String phone, String message) throws IOException {
+    protected void sendMessage(String phone, String message) throws IOException {
         byte[] out = this.getBytes(phone, message);
         this.sendBytes(phone, out);
     }

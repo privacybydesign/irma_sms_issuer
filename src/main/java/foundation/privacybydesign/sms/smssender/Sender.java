@@ -3,12 +3,7 @@ package foundation.privacybydesign.sms.smssender;
 import foundation.privacybydesign.sms.SMSConfiguration;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Send a SMS message.
@@ -24,10 +19,10 @@ public abstract class Sender {
                 .toString();
     }
 
-    abstract protected void sendText(String phone, String message) throws IOException;
+    abstract protected void sendMessage(String phone, String message) throws IOException;
 
     public void send(String language, String phone, String token) throws IOException {
         String message = getMessage(language, phone, token);
-        sendText(phone, message);
+        sendMessage(phone, message);
     }
 }
