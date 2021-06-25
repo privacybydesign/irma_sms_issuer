@@ -63,7 +63,7 @@ public class CMGatewaySender extends Sender {
             text = scanner.useDelimiter("\\A").next();
         }
 
-        // CM returns empty string when sending the SMS succeeds.
+        // CM returns empty string when the SMS is successfully sent
         if (text == null) {
             throw new IOException("CM response could not be parsed");
         } else if (!text.equals("")) {
