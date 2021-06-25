@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Simple REST implementation of an SMS sender.
@@ -16,10 +17,10 @@ import java.net.*;
 public class SimpleRESTSender extends Sender {
     private static final Logger logger = LoggerFactory.getLogger(SimpleRESTSender.class);
 
-    public void send(String language, String phone, String token) throws IOException {
-        byte[] out = getMessage(language, phone, token);
+    public void sendText(String phone, String message) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
         String senderAddress = conf.getSMSSenderAddress();
+        byte[] out = message.getBytes(StandardCharsets.UTF_8);
         OutputStream os = null;
         try {
             URL url = new URL(senderAddress);

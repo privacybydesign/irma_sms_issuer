@@ -39,6 +39,7 @@ public class SMSConfiguration extends BaseConfiguration {
     private String sms_issuer = "";
     private String sms_credential = "";
     private String sms_attribute = "";
+    private CMGatewayConfiguration cm = null;
 
     public static SMSConfiguration getInstance() {
         if (instance == null) {
@@ -95,6 +96,10 @@ public class SMSConfiguration extends BaseConfiguration {
     public String getSMSAttribute() { return sms_attribute; }
 
     public SignatureAlgorithm getJwtAlgorithm() { return SignatureAlgorithm.RS256; }
+
+    public CMGatewayConfiguration getCMGatewayConfiguration() {
+        return cm;
+    }
 
     public PrivateKey getPrivateKey() throws KeyManagementException {
         return BaseConfiguration.getPrivateKey("sk.der");

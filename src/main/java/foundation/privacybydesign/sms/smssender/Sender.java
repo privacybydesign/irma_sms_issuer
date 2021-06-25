@@ -15,7 +15,7 @@ import java.util.Map;
  * Subclasses can implement how the message is actually delivered.
  */
 public abstract class Sender {
-    protected byte[] getMessage(String language, String phone, String token) {
+    private String getMessage(String language, String phone, String token) {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
         Formatter formatter = new Formatter();
@@ -41,8 +41,13 @@ public abstract class Sender {
                 throw new RuntimeException("Invalid encoding?");
             }
         }
-        return builder.toString().getBytes(StandardCharsets.UTF_8);
+        return builder.toString();
     }
 
-    abstract public void send(String language, String phone, String token) throws IOException;
+    abstract protected void sendText(String phone, String message) throws IOException;
+
+    public void send(String language, String phone, String token) throws IOException {
+        String message = getMessage(language, phone, token);
+        sendText(phone, message);
+    }
 }

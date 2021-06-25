@@ -11,16 +11,17 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Send a SMS token to a phone using REST, over a SSH tunnel.
  */
 public class SSHTunnelRESTSender extends Sender {
 
-    public void send(String language, String phone, String token) throws IOException {
+    public void sendText(String phone, String message) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
-        byte[] out = getMessage(language, phone, token);
+        byte[] out = message.getBytes(StandardCharsets.UTF_8);
 
         try {
             // Set up the HTTP connection
