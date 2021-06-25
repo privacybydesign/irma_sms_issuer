@@ -6,7 +6,7 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import foundation.privacybydesign.sms.ratelimit.InvalidPhoneNumberException;
 import foundation.privacybydesign.sms.ratelimit.MemoryRateLimit;
 import foundation.privacybydesign.sms.ratelimit.RateLimit;
-import foundation.privacybydesign.sms.smssender.CMGatewayRESTSender;
+import foundation.privacybydesign.sms.smssender.CMGatewaySender;
 import foundation.privacybydesign.sms.smssender.SSHTunnelRESTSender;
 import foundation.privacybydesign.sms.smssender.Sender;
 import foundation.privacybydesign.sms.smssender.SimpleRESTSender;
@@ -126,7 +126,7 @@ public class SMSRestApi {
                 sender = new SSHTunnelRESTSender();
                 break;
             case "cm":
-                sender = new CMGatewayRESTSender();
+                sender = new CMGatewaySender();
                 break;
             default:
                 throw new RuntimeException("Unknown SMS sender backend");

@@ -7,20 +7,19 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Simple REST implementation of an SMS sender.
  * Currently made for the "StartHere SMS Gateway App" but it could easily be
  * changed/extended for any other SMS gateway app based on REST.
  */
-public class SimpleRESTSender extends Sender {
+public class SimpleRESTSender extends RESTSender {
     private static final Logger logger = LoggerFactory.getLogger(SimpleRESTSender.class);
 
-    public void sendText(String phone, String message) throws IOException {
+    @Override
+    public void sendBytes(String phone, byte[] out) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
         String senderAddress = conf.getSMSSenderAddress();
-        byte[] out = message.getBytes(StandardCharsets.UTF_8);
         OutputStream os = null;
         try {
             URL url = new URL(senderAddress);

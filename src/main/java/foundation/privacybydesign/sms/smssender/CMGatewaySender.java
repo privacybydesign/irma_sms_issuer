@@ -19,7 +19,7 @@ import java.util.TreeMap;
  * Implements CM Gateway HTTP GET endpoint
  * https://www.cm.com/en-en/app/docs/api/business-messaging-api/1.0/index#http-get
  */
-public class CMGatewayRESTSender extends Sender {
+public class CMGatewaySender extends Sender {
     @Override
     protected void sendText(String phone, String message) throws IOException {
         CMGatewayConfiguration conf = SMSConfiguration.getInstance().getCMGatewayConfiguration();
@@ -83,7 +83,8 @@ public class CMGatewayRESTSender extends Sender {
                 String value = URLEncoder.encode(parameter.getValue(), StandardCharsets.UTF_8.name());
                 builder.append(String.format("%s=%s&", parameter.getKey(), value));
             } catch (UnsupportedEncodingException _e) {
-                // Encoding is hardcoded in the code, so it cannot be unsupported.
+                // Encoding is hardcoded in the code, so this catch is unreachable.
+                throw new RuntimeException("Invalid encoding?");
             }
         }
         // Remove final '&' character (or the '?' character if there are no parameters)
