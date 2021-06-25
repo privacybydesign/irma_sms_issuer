@@ -76,7 +76,7 @@ public class CMGatewaySender extends Sender {
         builder.append("?");
         for (Map.Entry<String,String> parameter : parameters.entrySet()) {
             // We only need alphabetic url parameter keys, so we reject all others.
-            if (!parameter.getKey().matches("^[a-z]*$")) {
+            if (!parameter.getKey().matches("^[a-z]+$")) {
                 throw new MalformedURLException("Invalid URL parameters");
             }
             try {
