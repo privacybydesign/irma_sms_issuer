@@ -52,6 +52,9 @@ public class CMGatewaySender extends Sender {
         URL url = this.constructURL(String.format("%s/gateway.ashx", endpoint), parameters);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(SMSConfiguration.getInstance().getSMSSenderTimeout());
+        connection.setReadTimeout(SMSConfiguration.getInstance().getSMSSenderTimeout());
+
         int responseStatus = connection.getResponseCode();
         if (responseStatus != 200) {
             throw new IOException(String.format("CM gateway returned status code %d", responseStatus));
