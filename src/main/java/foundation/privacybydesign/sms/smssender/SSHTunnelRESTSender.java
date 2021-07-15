@@ -15,12 +15,11 @@ import java.net.URI;
 /**
  * Send a SMS token to a phone using REST, over a SSH tunnel.
  */
-public class SSHTunnelRESTSender extends Sender {
+public class SSHTunnelRESTSender extends RESTSender {
 
-    public void send(String language, String phone, String token) throws IOException {
+    @Override
+    public void sendBytes(String phone, byte[] out) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
-
-        byte[] out = getMessage(language, phone, token);
 
         try {
             // Set up the HTTP connection

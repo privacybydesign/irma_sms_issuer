@@ -13,11 +13,11 @@ import java.net.*;
  * Currently made for the "StartHere SMS Gateway App" but it could easily be
  * changed/extended for any other SMS gateway app based on REST.
  */
-public class SimpleRESTSender extends Sender {
+public class SimpleRESTSender extends RESTSender {
     private static final Logger logger = LoggerFactory.getLogger(SimpleRESTSender.class);
 
-    public void send(String language, String phone, String token) throws IOException {
-        byte[] out = getMessage(language, phone, token);
+    @Override
+    public void sendBytes(String phone, byte[] out) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
         String senderAddress = conf.getSMSSenderAddress();
         OutputStream os = null;
