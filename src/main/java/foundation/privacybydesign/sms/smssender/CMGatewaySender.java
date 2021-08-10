@@ -62,8 +62,8 @@ public class CMGatewaySender extends Sender {
 
         InputStream responseBody = connection.getInputStream();
         String text;
-        try (Scanner scanner = new Scanner(responseBody, StandardCharsets.UTF_8.name())) {
-            text = scanner.useDelimiter("\\A").next();
+        try (Scanner scanner = new Scanner(responseBody, StandardCharsets.UTF_8.name()).useDelimiter("\\A")) {
+            text = scanner.hasNext() ? scanner.next() : "";
         }
 
         // CM returns empty string when the SMS is successfully sent
