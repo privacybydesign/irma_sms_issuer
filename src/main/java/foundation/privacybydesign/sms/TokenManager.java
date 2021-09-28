@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Generate and verify tokens sent in the SMS message.
@@ -15,15 +15,15 @@ import java.util.Map;
  */
 public class TokenManager {
     static private TokenManager instance;
-    private static Logger logger = LoggerFactory.getLogger(TokenManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(TokenManager.class);
 
     // Map to store sent tokens.
     // Format: {"phone": TokenRequest}
-    private HashMap<String, TokenRequest> tokenMap;
-    private SecureRandom random;
+    private final Map<String, TokenRequest> tokenMap;
+    private final SecureRandom random;
 
     public TokenManager() {
-        tokenMap = new HashMap<>();
+        tokenMap = new ConcurrentHashMap<>();
         random = new SecureRandom();
     }
 
@@ -81,6 +81,7 @@ public class TokenManager {
     }
 
     void periodicCleanup() {
+        // Use enhanced for loop, because an iterator makes sure concurrency issues cannot occur.
         for (Map.Entry<String, TokenRequest> entry : tokenMap.entrySet()) {
             if (entry.getValue().isExpired()) {
                 tokenMap.remove(entry.getKey());
