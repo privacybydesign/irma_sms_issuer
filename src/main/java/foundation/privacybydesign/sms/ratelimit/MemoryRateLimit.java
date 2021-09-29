@@ -1,7 +1,7 @@
 package foundation.privacybydesign.sms.ratelimit;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Store rate limits in memory. Useful for debugging and rate limits that
@@ -28,12 +28,12 @@ public class MemoryRateLimit extends RateLimit {
 
     private static MemoryRateLimit instance;
 
-    private HashMap<String, Long> ipLimits;
-    private HashMap<String, Limit> phoneLimits;
+    private final Map<String, Long> ipLimits;
+    private final Map<String, Limit> phoneLimits;
 
     public MemoryRateLimit() {
-        ipLimits = new HashMap<>();
-        phoneLimits = new HashMap<>();
+        ipLimits = new ConcurrentHashMap<>();
+        phoneLimits = new ConcurrentHashMap<>();
     }
 
     public static MemoryRateLimit getInstance() {
@@ -136,6 +136,7 @@ public class MemoryRateLimit extends RateLimit {
 
     public void periodicCleanup() {
         long now = System.currentTimeMillis();
+        // Use enhanced for loop, because an iterator makes sure concurrency issues cannot occur.
         for (Map.Entry<String, Long> entry : ipLimits.entrySet()) {
             if (entry.getValue() < startLimitIP(now)) {
                 ipLimits.remove(entry.getKey());
