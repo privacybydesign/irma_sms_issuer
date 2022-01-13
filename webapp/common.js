@@ -224,6 +224,7 @@ function onSubmitToken(e) {
                     result: false,
                 },
             })
+                .start()
                 .then(() => {
                     setStatus('success', MESSAGES['phone-add-success']);
                 })
