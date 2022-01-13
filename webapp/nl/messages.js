@@ -16,7 +16,6 @@ var MESSAGES = {
     'hour': '%n% uur',
     'hours': '%n% uur',
     'phone-add-success': 'Telefoonnummer toegevoegd.',
-    'phone-add-timeout': 'De sessie is verlopen. Herlaad de pagina om het opnieuw te proberen.',
     'phone-add-cancel': 'Geannuleerd.',
     'phone-add-error': 'Het is helaas niet gelukt dit telefoonnummer toe te voegen aan de IRMA app.',
     'error:phone-number-format': 'Je hebt geen geldig telefoonnummer ingevoerd. Controleer of het ingevoerde telefoonnummer klopt.',
