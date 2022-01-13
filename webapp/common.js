@@ -210,23 +210,28 @@ function onSubmitToken(e) {
         .done(function(jwt) {
             console.log('received JWT:', jwt);
             setStatus('info', MESSAGES['issuing-credential']);
-            irma.startSession(CONF.IRMASERVER, jwt, "publickey")
-                .then(({ sessionPtr, token }) => irma.handleSession(sessionPtr, {
-                    server: CONF.IRMASERVER,
-                    language: MESSAGES['lang'],
-                    token,
-                }))
-                .then((e) => {
+            irma.newPopup({
+                url: CONF.IRMASERVER,
+                language: MESSAGES['lang'],
+                session: {
+                    start: {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain',
+                        },
+                        body: jwt,
+                    },
+                    result: false,
+                },
+            })
+                .start()
+                .then(() => {
                     setStatus('success', MESSAGES['phone-add-success']);
-                    console.log('phone added:', e);
                 })
                 .catch((e) => {
-                    if (e === irma.SessionStatus.Cancelled) {
+                    if (e === 'Aborted') {
                         console.warn('cancelled:', e);
                         setStatus('info', MESSAGES['phone-add-cancel']);
-                    } else if (e === irma.SessionStatus.Timeout) {
-                        console.warn('cancelled:', e);
-                        setStatus('info', MESSAGES['phone-add-timeout']);
                     } else {
                         setStatus('danger', MESSAGES['phone-add-error']);
                         console.error('error:', e);

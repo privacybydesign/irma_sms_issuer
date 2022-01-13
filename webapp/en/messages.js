@@ -16,7 +16,6 @@ var MESSAGES = {
     'hour': '%n% hour',
     'hours': '%n% hour',
     'phone-add-success': 'Phone number attribute has been added.',
-    'phone-add-timeout': 'The session timed out. Please reload this page and try again.',
     'phone-add-cancel': 'Cancelled.',
     'phone-add-error': 'Adding the phone number attribute failed, unfortunately.',
     'error:phone-number-format': 'You did not enter a valid telephone number. Please check whether the telephone number is correct.',
