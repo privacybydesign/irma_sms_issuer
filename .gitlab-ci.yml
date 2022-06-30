@@ -23,7 +23,7 @@ build-webapp:
       - artifacts/webapp
 
 build-war:
-  image: privacybydesign/jdk8:latest
+  image: privacybydesign/jdk11:latest
   stage: build
   script:
     - mkdir artifacts
