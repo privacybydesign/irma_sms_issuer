@@ -64,7 +64,9 @@ function setWindow(window, back) {
 
     const backButton = $('#back-button');
     backButton.off();
+    backButton.hide();
     if (back) {
+        backButton.show();
         backButton
           .click(() => {clearStatus(); setWindow(back); return false;})
           .removeAttr('href')
