@@ -64,17 +64,13 @@ function setWindow(window, back) {
 
     const backButton = $('#back-button');
     backButton.off();
-    backButton.hide();
     if (back) {
-        backButton.show();
         backButton
           .click(() => {clearStatus(); setWindow(back); return false;})
           .removeAttr('href')
           .removeClass('button-hidden');
-    } else {
-        backButton.attr('href', 'javascript:history.length==1?window.close():history.back()');
-        if (isInApp)
-            backButton.addClass('button-hidden');
+    } else if (history.length == 1) {
+        backButton.addClass('button-hidden');
     }
 
     const submitButton = $('#submit-button');
