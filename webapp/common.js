@@ -67,9 +67,12 @@ function setWindow(window, back) {
     if (back) {
         backButton
           .click(() => {clearStatus(); setWindow(back); return false;})
-          .removeAttr('href')
           .removeClass('button-hidden');
-    } else if (history.length == 1) {
+    } else if (history.length >  1) {
+        backButton
+          .click(() => {clearStatus(); history.back(); return false;})
+          .removeClass('button-hidden');
+    } else {
         backButton.addClass('button-hidden');
     }
 
