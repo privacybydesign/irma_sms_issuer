@@ -12,12 +12,12 @@
   "sms_sender_number": "",
   "token_validity": 900,
   "sms_templates": {
-    "nl": "IRMA verificatecode: %s\nOf direct via een link:\nhttps://privacybydesign.foundation/uitgifte/telefoonnummer#!verify:%s",
-    "en": "IRMA verification code: %s\nOr directly via a URL:\nhttps://privacybydesign.foundation/issuance/phonenumber#!verify:%s"
+    "nl": "Yivi verificatecode: %s\nOf direct via een link:\nhttps://privacybydesign.foundation/uitgifte/telefoonnummer#!verify:%s",
+    "en": "Yivi verification code: %s\nOr directly via a URL:\nhttps://privacybydesign.foundation/issuance/phonenumber#!verify:%s"
   },
   "private_key_path": "sk.der",
   "server_name": "irma_sms_issuer",
-  "human_readable_name": "Privacy by Design Foundation",
+  "human_readable_name": "Yivi",
   "scheme_manager": "pbdf",
   "sms_issuer": "pbdf",
   "sms_credential": "sms",

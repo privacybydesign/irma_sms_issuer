@@ -211,7 +211,7 @@ function onSubmitToken(e) {
         .done(function(jwt) {
             console.log('received JWT:', jwt);
             setStatus('info', MESSAGES['issuing-credential']);
-            irma.newPopup({
+            yivi.newPopup({
                 url: CONF.IRMASERVER,
                 language: MESSAGES['lang'],
                 session: {

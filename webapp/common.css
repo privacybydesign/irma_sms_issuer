@@ -1,25 +1,33 @@
 @font-face {
-  font-family: 'Montserrat';
-  src: url('./fonts/subset-Montserrat-Regular.woff2') format('woff2'),
-  url('./fonts/subset-Montserrat-Regular.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
+	font-family: 'Alexandria';
+	src: url('./fonts/alexandria-v1-latin-regular.woff2') format('woff2'),
+		url('./fonts/alexandria-v1-latin-regular.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
 }
 
 @font-face {
-  font-family: 'Karla';
-  src: url('./fonts/subset-Karla-Bold.woff2') format('woff2'),
-  url('./fonts/subset-Karla-Bold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
+	font-family: 'Alexandria';
+	src: url('./fonts/alexandria-v1-latin-700.woff2') format('woff2'),
+		url('./fonts/alexandria-v1-latin-700.woff') format('woff');
+	font-weight: bold;
+	font-style: normal;
 }
 
 @font-face {
-  font-family: 'Montserrat';
-  src: url('./fonts/subset-Montserrat-SemiBold.woff2') format('woff2'),
-  url('./fonts/subset-Montserrat-SemiBold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
+	font-family: 'Open Sans';
+	src: url('./fonts/open-sans-v34-latin-regular.woff2') format('woff2'),
+		url('./fonts/open-sans-v34-latin-regular.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	src: url('./fonts/open-sans-v34-latin-700.woff2') format('woff2'),
+		url('./fonts/open-sans-v34-latin-700.woff') format('woff');
+	font-weight: bold;
+	font-style: normal;
 }
 
 @font-face {
@@ -35,12 +43,12 @@ html, body {
   height: 100%;
   font-size: 16px;
   line-height: 24px;
-  background-color: #F2F5F8;
-  font-family: 'Montserrat', Verdana, Arial, sans-serif;
+	background-color: #FAFAFA;
+	font-family: 'Open Sans', Verdana, Arial, sans-serif;
 }
 
 a {
-  color: #004C92;
+  color: #484747;
 }
 
 .container {
@@ -50,8 +58,9 @@ a {
 }
 
 header {
-  background-color: #DFE6EE;
-  color: #3C4B5A;
+	background: #FFFFFF;
+	color: #484747;
+	border-bottom: 1px solid #EAE5E2
 }
 
 header h1 {
@@ -66,7 +75,7 @@ h1 {
   line-height: 22px;
   padding: 16px 0;
   font-weight: bold;
-  font-family: 'Karla', Verdana, Arial, sans-serif;
+  font-family: 'Alexandria', Verdana, Arial, sans-serif;
 }
 
 main {
@@ -76,20 +85,15 @@ main {
   color: #15222E;
   max-width: 600px;
   margin: auto;
+  flex: 1;
 }
 
 #phone-confirm {
   font-weight: bold;
 }
 
-.status-container {
-  max-width: 600px;
-  margin: auto;
-  padding: 16px;
-  color: white;
-  display: flex;
-  align-items: center;
-}
+
+
 
 .hidden {
   display: none;
@@ -99,20 +103,33 @@ main {
   visibility: hidden;
 }
 
+.alert {
+	max-width: 600px;
+	margin: 16px auto 16px auto;
+	padding: 20px;
+	color: #FFFFFF;
+	border-radius: 6px;
+}
+
+.status-container {
+	display: flex;
+	align-items: center;
+}
+
 .alert-info {
-  background-color: #004c92;
+  background-color: #96C5E1;
 }
 
 .alert-danger {
-  background-color: #d44454;
+  background-color: #C30025;
 }
 
 .alert-warning {
-  background-color: #f0ad4e;
+  background-color: #CE5700;
 }
 
 .alert-success {
-  background-color: #079268;
+  background-color: #00973A;
 }
 
 .alert-success .status-container:before {
@@ -125,16 +142,10 @@ main {
   margin-right: 16px;
 }
 
-main {
-  flex: 1;
-}
-
 label {
   margin-top: 2rem;
   margin-bottom: 0.5rem;
   display: block;
-  font-size: 12px;
-  line-height: 15px;
   font-weight: bold;
   color: #3C4B5A;
 }
@@ -143,12 +154,11 @@ input {
   height: 32px;
   display: block;
   border: none;
-  border-bottom: 2px solid #004C92;
+  border-bottom: 2px solid #484747;
   width: 100%;
   font-size: 16px;
   line-height: 24px;
   background-color: transparent;
-  font-family: 'Montserrat', Verdana, Arial, sans-serif;
 }
 
 input.error {
@@ -169,7 +179,7 @@ input.error:focus {
   align-items: center;
   justify-content: space-between;
   border: none;
-  border-bottom: 1px solid #3C4B5A;
+  border-bottom: 1px solid #484747;
 }
 
 .confirm-container:after {
@@ -179,12 +189,13 @@ input.error:focus {
   line-height: initial;
   vertical-align: middle;
   content: '\E026';
-  color: #079268;
+  color: #00973A;
 }
 
 footer {
-  background-color: #DFE6EE;
-  padding: 16px;
+	padding: 16px;
+	background: #FFFFFF;
+	border-top: 1px solid #EAE5E2;
 }
 
 footer .actions {
@@ -195,25 +206,30 @@ footer .actions {
 }
 
 footer a, button {
-  display: inline-block;
-  padding: 14px 34px;
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 28px;
+	font-family: 'Alexandria', Verdana, Arial, sans-serif;
+	display: inline-block;
+	text-align: center;
+	font-size: 16px;
+	height: 48px;
+	font-weight: bold;
+	cursor: pointer;
+	border-radius: 6px;
+	width: 48%;
+	max-width: 343px;
 }
 
 footer a {
-  text-decoration: none;
-  color: #004C92;
+	background-color: #FFFFFF;
+	text-decoration: none;
+	color: #484747;
+	line-height: 48px;
+	border: 1px solid #484747;
 }
 
 footer button {
-  background-color: #004C92;
-  color: white;
-  border: none;
-  font-family: 'Montserrat', Verdana, Arial, sans-serif;
+	border: none;
+	color: #FFFFFF;
+	background: #E12747 url('./images/button-primary.svg') no-repeat right top;
 }
 
 .iti-flag {background-image: url("telwidget/img/flags.png");}
@@ -244,4 +260,20 @@ input[type="tel"] {
 
 #block-token {
   margin-top: 1em;
+}
+
+@media only screen and (max-width: 640px) {
+	.alert {
+		margin: 16px;
+	}
+}
+
+@media only screen and (max-width: 340px) {
+	html,
+	body,
+	footer a,
+	footer button,
+	input {
+		font-size: 14px;
+	}
 }
