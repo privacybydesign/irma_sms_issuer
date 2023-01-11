@@ -212,9 +212,9 @@ function onSubmitToken(e) {
             console.log('received JWT:', jwt);
             setStatus('info', MESSAGES['issuing-credential']);
             yivi.newPopup({
-                url: CONF.IRMASERVER,
                 language: MESSAGES['lang'],
                 session: {
+                    url: CONF.IRMASERVER,
                     start: {
                         method: 'POST',
                         headers: {
