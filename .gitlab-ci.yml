@@ -21,7 +21,7 @@ build-webapp:
       - artifacts/webapp
 
 build-war:
-  image: openjdk:11
+  image: gradle:6-jdk11
   stage: build
   script:
     - mkdir artifacts
