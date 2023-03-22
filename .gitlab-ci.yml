@@ -5,7 +5,7 @@ before_script:
   - set -euxo pipefail
 
 build-webapp:
-  image: privacybydesign/node_yarn:latest
+  image: node:18
   stage: build
   script:
     - cd webapp
@@ -17,13 +17,11 @@ build-webapp:
     - ./webapp/build.sh nl
     - mv webapp/build artifacts/webapp/nl
   artifacts:
-    # Disabling artifact expiry is not supported yet, so make
-    expire_in: 100 year
     paths:
       - artifacts/webapp
 
 build-war:
-  image: privacybydesign/jdk11:latest
+  image: openjdk:11
   stage: build
   script:
     - mkdir artifacts
@@ -31,7 +29,5 @@ build-war:
     - gradle build
     - mv build/libs/irma_sms_issuer-1.0.war ./irma_sms_issuer-1.0.war
   artifacts:
-    # Disabling artifact expiry is not supported yet, so make
-    expire_in: 100 year
     paths:
       - irma_sms_issuer-1.0.war
