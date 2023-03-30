@@ -7,7 +7,7 @@
     "build": "./build.sh"
   },
   "dependencies": {
-    "@privacybydesign/irma-frontend": "^0.4.3",
-    "jquery": "^3.4.1"
+    "@privacybydesign/yivi-frontend": "^0.1.0",
+    "jquery": "^3.6.3"
   }
 }

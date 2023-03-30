@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="assets/telwidget/css/intlTelInput.min.css">
   <link rel="stylesheet" href="assets/common.css">
   <script src="assets/jquery.min.js" defer></script>
-  <script src="assets/irma.js" defer></script>
+  <script src="assets/yivi.js" defer></script>
   <script src="assets/telwidget/js/intlTelInput.min.js" defer></script>
   <script src="assets/messages.js" defer></script>
   <script src="assets/config.js" defer></script>
@@ -16,18 +16,19 @@
 <body>
 <div class="container">
   <header></header>
-  <div id="status-bar" class="alert hidden" role="alert">
-    <div class="status-container">
-      <div id="status"></div>
-    </div>
-  </div>
   <main>
+    <div id="status-bar" class="alert hidden" role="alert">
+      <div class="status-container">
+        <div id="status"></div>
+      </div>
+    </div>
+    
     <div id="block-phone">
-      <h1>Adding a phone number</h1>
-      <p>On this page you can add a (European) mobile telephone number to your IRMA app.</p>
+      <h1>Add phone number</h1>
+      <p>On this page you can add a (European) mobile telephone number to your Yivi app.</p>
       <p>
-        Do you want to add multiple mobile phone numbers to your IRMA app?
-        Then perform these steps multiple times.
+        Do you want to add multiple mobile phone numbers?
+        Then follow these steps for each phone number you want to add.
       </p>
       <form id="phone-form">
         <label for="phone">Phone number</label>
@@ -39,24 +40,22 @@
     <div id="block-confirm" style="display: none">
       <h1>Check your phone number</h1>
       <p>
-        Please check your phone number again for correctness.
-        Choose 'Back' to correct your phone number.
+        Please check the phone number again for confirmation. Choose 'Back' to correct your phone number.
       </p>
       <label for="phone-confirm">Phone number</label>
       <div class="confirm-container"><input disabled id="phone-confirm" type="tel"></div>
     </div>
 
     <div id="block-token" style="display: none">
-      <h1>Adding a phone number</h1>
-      <p>You receive a SMS from SIDN-IRMA.</p>
+      <h1>Add phone number</h1>
+      <p>You will receive a text message from Yivi.</p>
       <b>Please go through the following steps:</b>
       <ol>
-        <li>Open the SMS message sent by SIDN-IRMA.</li>
-        <li>Choose the link in the SMS message.</li>
-        <li>You will be forwarded back to the IRMA app.</li>
+        <li>Open the text message sent by Yivi.</li>
+        <li>Choose the link inside the text message.</li>
+        <li>You will be redirected back to your Yivi app.</li>
       </ol>
-      <p>In case you don't visit this web page using your mobile phone,
-        fill in the verification code from the SMS message below.</p>
+      <p>Not viewing this page on your mobile? Enter the verification code from the text message below</p>
       <form id="token-form">
         <label for="submit-token">Verification code</label>
         <input type="text" required class="form-control"

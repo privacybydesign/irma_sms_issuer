@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="assets/telwidget/css/intlTelInput.min.css">
   <link rel="stylesheet" href="assets/common.css">
   <script src="assets/jquery.min.js" defer></script>
-  <script src="assets/irma.js" defer></script>
+  <script src="assets/yivi.js" defer></script>
   <script src="assets/telwidget/js/intlTelInput.min.js" defer></script>
   <script src="assets/messages.js" defer></script>
   <script src="assets/config.js" defer></script>
@@ -16,15 +16,16 @@
 <body>
 <div class="container">
   <header></header>
-  <div id="status-bar" class="alert hidden" role="alert">
-    <div class="status-container">
-      <div id="status"></div>
-    </div>
-  </div>
   <main>
+    <div id="status-bar" class="alert hidden" role="alert">
+      <div class="status-container">
+        <div id="status"></div>
+      </div>
+    </div>
+
     <div id="block-phone">
       <h1>Telefoonnummer toevoegen</h1>
-      <p>Zet je mobiele telefoonnummer in je IRMA app.</p>
+      <p>Zet je mobiele telefoonnummer in je Yivi-app.</p>
       <p>
         Wil je meerdere mobiele telefoonnummers toevoegen?
         Doorloop deze stappen dan voor elk telefoonnummer dat je wilt toevoegen.
@@ -45,12 +46,12 @@
 
     <div id="block-token" style="display: none">
       <h1>Telefoonnummer toevoegen</h1>
-      <p>Je ontvangt een SMS van SIDN-IRMA.</p>
+      <p>Je ontvangt een SMS van Yivi.</p>
       <b>Doorloop de volgende stappen:</b>
       <ol>
-        <li>Open het SMS-bericht afkomstig van SIDN-IRMA.</li>
+        <li>Open het SMS-bericht afkomstig van Yivi.</li>
         <li>Kies de link in het SMS-bericht.</li>
-        <li>Je wordt teruggestuurd naar de IRMA-app.</li>
+        <li>Je wordt teruggestuurd naar je Yivi-app.</li>
       </ol>
       <p>Bekijk je deze pagina niet op je mobiel? Vul hieronder de verificatiecode uit het SMS-bericht in.</p>
       <form id="token-form">

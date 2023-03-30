@@ -211,10 +211,10 @@ function onSubmitToken(e) {
         .done(function(jwt) {
             console.log('received JWT:', jwt);
             setStatus('info', MESSAGES['issuing-credential']);
-            irma.newPopup({
-                url: CONF.IRMASERVER,
+            yivi.newPopup({
                 language: MESSAGES['lang'],
                 session: {
+                    url: CONF.IRMASERVER,
                     start: {
                         method: 'POST',
                         headers: {
