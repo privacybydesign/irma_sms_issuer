@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@privacybydesign/yivi-frontend@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@privacybydesign/yivi-frontend/-/yivi-frontend-0.1.1.tgz"
-  integrity sha512-aaatPlk+ljcO6v51ZXQDOwd7UUSHaHsRzAZ79ibIZ45UgcoQEX4WyzQEoK8wnMowSXrC3UFrYWHhcBpOqy3nlQ==
+"@privacybydesign/yivi-frontend@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@privacybydesign/yivi-frontend/-/yivi-frontend-0.1.2.tgz"
+  integrity sha512-HnF/hlu2qn+eG/gsBYKvbgdv2O8AptqNTHjvc/o7JKLwPI3GJCxPwr8+JQKrcI7q8AqE0aHJusklKiJZLLJc7g==
 
-jquery@^3.6.3:
-  version "3.6.3"
-  resolved "https://registry.npmjs.org/jquery/-/jquery-3.6.3.tgz"
-  integrity sha512-bZ5Sy3YzKo9Fyc8wH2iIQK4JImJ6R0GWI9kL1/k7Z91ZBNgkRXE6U0JfHIizZbort8ZunhSI3jw9I6253ahKfg==
+jquery@^3.6.4:
+  version "3.6.4"
+  resolved "https://registry.npmjs.org/jquery/-/jquery-3.6.4.tgz"
+  integrity sha512-v28EW9DWDFpzcD9O5iyJXg3R3+q+mET5JhnjJzQUZMHOv67bpSIHq81GEYpPNZHG+XXHsfSme3nxp/hndKEcsQ==

@@ -7,7 +7,7 @@
     "build": "./build.sh"
   },
   "dependencies": {
-    "@privacybydesign/yivi-frontend": "^0.1.1",
-    "jquery": "^3.6.3"
+    "@privacybydesign/yivi-frontend": "^0.1.2",
+    "jquery": "^3.6.4"
   }
 }
