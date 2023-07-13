@@ -88,8 +88,6 @@ public class SSHTunnelRESTSender extends RESTSender {
             throw new InternalServerErrorException("cannot parse configured URL");
         } catch (JSchException e) {
             throw new IOException("JSch error: " + e.getMessage());
-        } finally {
-        
         }
     }
 }
