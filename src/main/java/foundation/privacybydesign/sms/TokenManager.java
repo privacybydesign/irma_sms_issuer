@@ -5,9 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,40 +61,24 @@ public class TokenManager {
             return false;
         }
 
-        // Create hash of the token so we can safely print it in logs.
-        String tokenHash = md5(token);
-
         if (tr.isExpired()) {
             // Expired, but not yet cleaned out by periodicCleanup()
-            logger.error("Token with hash {} expired", tokenHash);
+            logger.error("Token expired");
             return false;
         }
         if (!CryptoUtil.isEqualsConstantTime(tr.token.toCharArray(), token.toCharArray())) {
             tr.tries++;
-            logger.error("Token with hash {} is wrong", tokenHash);
+            logger.error("Token is wrong");
             return false;
         }
         if (tr.tries > 3) {
-            logger.error("Token with hash {} was tried to validate too often", tokenHash);
+            logger.error("Token was tried to validate too often");
             // User may try at most 3 times, it shouldn't be that hard.
             // TODO: report this error back to the user.
             return false;
         }
         tokenMap.remove(phone);
         return true;
-    }
-
-    public String md5(String input) {
-        String hash = null;
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            md5.update(StandardCharsets.UTF_8.encode(input));
-            hash = String.format("%032x", new BigInteger(1, md5.digest()));
-        }
-        catch(NoSuchAlgorithmException e){
-            logger.error("Could not generate MD5 hash");
-        }
-        return hash;
     }
 
     void periodicCleanup() {
