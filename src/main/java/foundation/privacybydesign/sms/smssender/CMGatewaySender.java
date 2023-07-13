@@ -69,7 +69,7 @@ public class CMGatewaySender extends Sender {
         // CM returns empty string when the SMS is successfully sent
         if (text == null) {
             throw new IOException("CM response could not be parsed");
-        } else if (!text.equals("")) {
+        } else if (!text.isEmpty()) {
             throw new IOException(String.format("Error response received from CM: %s", text));
         }
     }

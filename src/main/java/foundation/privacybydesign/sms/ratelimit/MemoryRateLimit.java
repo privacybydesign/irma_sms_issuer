@@ -47,6 +47,7 @@ public class MemoryRateLimit extends RateLimit {
         return now - IP_TIMEOUT*IP_TRIES;
     }
 
+    @Override
     protected synchronized long nextTryIP(String ip, long now) {
         // Allow at most 1 try in each period (TIMEOUT), but kick in only
         // after 3 tries. Thus while the user can do only 1 try per period
@@ -69,6 +70,7 @@ public class MemoryRateLimit extends RateLimit {
         return limit;
     }
 
+    @Override
     protected synchronized void countIP(String ip, long now) {
         long nextTry = nextTryIP(ip, now);
         if (nextTry > now) {
@@ -78,6 +80,7 @@ public class MemoryRateLimit extends RateLimit {
     }
 
     // Is the user over the rate limit per phone number?
+    @Override
     protected synchronized long nextTryPhone(String phone, long now) {
         // Rate limiter durations (sort-of logarithmic):
         // 1   10 second
@@ -117,6 +120,7 @@ public class MemoryRateLimit extends RateLimit {
 
     // Count the usage of this rate limit - adding to the budget for this
     // phone number.
+    @Override
     protected synchronized void countPhone(String phone, long now) {
         long nextTry = nextTryPhone(phone, now);
         Limit limit = phoneLimits.get(phone);
