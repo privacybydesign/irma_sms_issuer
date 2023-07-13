@@ -17,7 +17,7 @@ public class SimpleRESTSender extends RESTSender {
     private static final Logger logger = LoggerFactory.getLogger(SimpleRESTSender.class);
 
     @Override
-    public void sendBytes(String phone, byte[] out) throws IOException {
+    public void sendBytes(byte[] out) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
         String senderAddress = conf.getSMSSenderAddress();
         OutputStream os = null;
