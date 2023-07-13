@@ -149,8 +149,7 @@ public class SMSRestApi {
     @POST
     @Path("verify")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response verifySmsCode(@Context HttpServletRequest req,
-                                @FormParam("phone") String phone,
+    public Response verifySmsCode(@FormParam("phone") String phone,
                                 @FormParam("token") String token)
             throws KeyManagementException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
