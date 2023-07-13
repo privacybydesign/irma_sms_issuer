@@ -62,16 +62,16 @@ public class TokenManager {
         }
         if (tr.isExpired()) {
             // Expired, but not yet cleaned out by periodicCleanup()
-            logger.error("Token {} expired", token);
+            logger.error("Token expired");
             return false;
         }
         if (!CryptoUtil.isEqualsConstantTime(tr.token.toCharArray(), token.toCharArray())) {
             tr.tries++;
-            logger.error("Token {} is wrong", token);
+            logger.error("Token is wrong");
             return false;
         }
         if (tr.tries > 3) {
-            logger.error("Token {} was tried to validate too often", token);
+            logger.error("Token was tried to validate too often");
             // User may try at most 3 times, it shouldn't be that hard.
             // TODO: report this error back to the user.
             return false;
