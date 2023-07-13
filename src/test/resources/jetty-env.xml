@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
     <!-- Disable scanning of jars, this can mess stuff up bigtime, but
          it makes booting a whole lot faster, see:

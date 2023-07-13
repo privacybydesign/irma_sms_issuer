@@ -6,7 +6,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import foundation.privacybydesign.sms.SMSConfiguration;
 
-import javax.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.InternalServerErrorException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,7 +29,7 @@ public class SSHTunnelRESTSender extends RESTSender {
             // Unfortunately, JSch doesn't support ed25519 keys.
             // https://sourceforge.net/p/jsch/feature-requests/7/
 
-            URI sshkey = conf.getConfigurationDirectory().resolve(conf.getSMSSenderKeyPath());
+            URI sshkey = SMSConfiguration.getConfigurationDirectory().resolve(conf.getSMSSenderKeyPath());
             if (sshkey == null) {
                 throw new IOException("SSH private key not found");
             }
@@ -62,6 +62,12 @@ public class SSHTunnelRESTSender extends RESTSender {
             // Read (part of) the HTTP response
             BufferedReader bis = new BufferedReader(new InputStreamReader(is));
             String line = bis.readLine();
+
+            os.close();
+            is.close();
+            chan.disconnect();
+            session.disconnect();
+
             if (line == null) {
                 throw new IOException("EOF has been reached before HTTP response could be read");
             }
@@ -77,14 +83,13 @@ public class SSHTunnelRESTSender extends RESTSender {
             }
             // TODO: a 200 response is sent even if the phone doesn't have a
             // SIM card in it.
-            os.close();
-            is.close();
-            chan.disconnect();
-            session.disconnect();
+
         } catch (MalformedURLException e) {
             throw new InternalServerErrorException("cannot parse configured URL");
         } catch (JSchException e) {
             throw new IOException("JSch error: " + e.getMessage());
+        } finally {
+        
         }
     }
 }
