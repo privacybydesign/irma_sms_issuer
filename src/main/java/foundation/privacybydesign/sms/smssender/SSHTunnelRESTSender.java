@@ -18,7 +18,7 @@ import java.net.URI;
 public class SSHTunnelRESTSender extends RESTSender {
 
     @Override
-    public void sendBytes(String phone, byte[] out) throws IOException {
+    public void sendBytes(byte[] out) throws IOException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
         try {

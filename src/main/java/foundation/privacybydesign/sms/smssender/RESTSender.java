@@ -34,11 +34,11 @@ public abstract class RESTSender extends Sender {
         return builder.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    abstract void sendBytes(String phone, byte[] out) throws IOException;
+    abstract void sendBytes(byte[] out) throws IOException;
 
     @Override
     protected void sendMessage(String phone, String message) throws IOException {
         byte[] out = this.getBytes(phone, message);
-        this.sendBytes(phone, out);
+        this.sendBytes(out);
     }
 }
