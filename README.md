@@ -21,9 +21,7 @@ Set the `sms_sender_address` inside `src/main/resources/config.sample.json` to m
 
 ```json
 {
-  ...
   "sms_sender_address": "http://192.168.1.100:8766",
-  ...
 }
 ```
 

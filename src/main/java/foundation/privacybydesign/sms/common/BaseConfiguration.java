@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 public class BaseConfiguration<T> {
     // Override these in a static {} block
-    public static Class<? extends BaseConfiguration> clazz;
+    public static Class<? extends BaseConfiguration<?>> clazz;
     public static Logger logger = LoggerFactory.getLogger(BaseConfiguration.class);
     public static String filename = "config.json";
     public static String environmentVarPrefix = "IRMA_CONF_";
@@ -33,7 +33,7 @@ public class BaseConfiguration<T> {
     public static boolean testing = false;
 
     // Return this from a static getInstance()
-    public static BaseConfiguration instance;
+    public static BaseConfiguration<?> instance;
     private static URI confPath;
 
 
@@ -54,7 +54,7 @@ public class BaseConfiguration<T> {
         }
     }
 
-    public static BaseConfiguration getInstance() {
+    public static BaseConfiguration<?> getInstance() {
         if (instance == null)
             load();
         return instance;
@@ -167,28 +167,34 @@ public class BaseConfiguration<T> {
         }
 
         T overrideValue;
-        if (cls == int.class) {
-            try {
-                Integer parsed = Integer.parseInt(env);
-                overrideValue = (T) parsed;
-            } catch (NumberFormatException e) {
-                logger.warn("Could not parse config entry as int: " + confEntry + " with value: " + env);
-                return null;
+
+        try {
+            if (cls == int.class) {
+                try {
+                    Integer parsed = Integer.parseInt(env);
+                    overrideValue =  cls.cast(parsed);
+                } catch (NumberFormatException e) {
+                    logger.warn("Could not parse config entry as int: " + confEntry + " with value: " + env);
+                    return null;
+                }
+            } else if (cls == boolean.class) {
+                Boolean parsed = Boolean.parseBoolean(env);
+                overrideValue = cls.cast(parsed);
+            } else if (cls == String.class) {
+                overrideValue = cls.cast(env);
+            } else if (cls == HashMap.class){ // Try to parse as hashmap for authorized_??? entries
+                try {
+                    overrideValue = cls.cast(GsonUtil.getGson().fromJson(env, cls));
+                } catch (JsonSyntaxException e) {
+                    logger.warn("Could not parse config entry as json: " + confEntry + " with value: " + env);
+                    return null;
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid class specified, must be one of: Integer, Boolean, String, HashMap");
             }
-        } else if (cls == boolean.class) {
-            Boolean parsed = Boolean.parseBoolean(env);
-            overrideValue = (T) parsed;
-        } else if (cls == String.class) {
-            overrideValue = cls.cast(env);
-        } else if (cls == HashMap.class){ // Try to parse as hashmap for authorized_??? entries
-            try {
-                overrideValue = cls.cast(GsonUtil.getGson().fromJson(env, cls));
-            } catch (JsonSyntaxException e) {
-                logger.warn("Could not parse config entry as json: " + confEntry + " with value: " + env);
-                return null;
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid class specified, must be one of: Integer, Boolean, String, HashMap");
+        } catch (ClassCastException e){
+            logger.warn("Could not cast config entry: " + confEntry + " with value: " + env);
+            return null;
         }
 
         logger.info("Overriding config entry " + confEntry + " with value: " + env);
