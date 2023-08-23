@@ -6,6 +6,8 @@ src/main/resources/config.json
 id_rsa*
 webapp/node_modules
 webapp/build
+webapp/config.js
 artifacts
 .idea/
 bin/
+.DS_Store
