@@ -1,6 +1,6 @@
 package foundation.privacybydesign.sms;
 
-import foundation.privacybydesign.common.BaseConfiguration;
+import foundation.privacybydesign.sms.common.BaseConfiguration;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.irmacard.api.common.util.GsonUtil;
 
