@@ -4,7 +4,7 @@ version '1.0'
 apply plugin: 'war'
 apply plugin: 'org.gretty'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 
 buildscript {
     repositories {
