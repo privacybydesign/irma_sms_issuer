@@ -5,8 +5,8 @@
   "sms_sender_ssh_user": "",
   "sms_sender_ssh_key_path": ".ssh/id_rsa",
   "sms_sender_ssh_key_passphrase": "",
-  "sms_sender_address": "http://localhost:8080/v1/sms/",
-  "sms_sender_param_phone": "phone",
+  "sms_sender_address": "http://ip-address:8766",
+  "sms_sender_param_phone": "number",
   "sms_sender_param_message": "message",
   "sms_sender_timeout": 5000,
   "sms_sender_number": "",
@@ -15,11 +15,11 @@
     "nl": "Yivi verificatecode: %s\nOf direct via een link:\nhttps://privacybydesign.foundation/uitgifte/telefoonnummer#!verify:%s",
     "en": "Yivi verification code: %s\nOr directly via a URL:\nhttps://privacybydesign.foundation/issuance/phonenumber#!verify:%s"
   },
-  "private_key_path": "sk.der",
+  "private_key_path": "sk.pem",
   "server_name": "irma_sms_issuer",
   "human_readable_name": "Yivi",
-  "scheme_manager": "pbdf",
-  "sms_issuer": "pbdf",
-  "sms_credential": "sms",
-  "sms_attribute": "sms"
+  "scheme_manager": "irma-demo",
+  "sms_issuer": "sidn-pbdf",
+  "sms_credential": "mobilenumber",
+  "sms_attribute": "mobilenumber"
 }
