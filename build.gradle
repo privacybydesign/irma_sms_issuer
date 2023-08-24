@@ -54,4 +54,5 @@ configurations.all {
 
 gretty {
     contextConfigFile = file('src/test/resources/jetty-env.xml')
+    extraResourceBase 'webapp/build'
 }
