@@ -15,9 +15,8 @@ Various configuration files, keys and settings need to be in place to be able to
 $ utils/keygen.sh
 ```
 
-
-2. Update the config.sample.json configuration:
-Set the `sms_sender_address` inside `src/main/resources/config.sample.json` to match the Address displayed in the StartHere SMS Gateway app. For example:
+2. Create the Java app configuration:
+Copy the file `src/main/resources/config.sample.json` to `src/main/resources/config.json` and set the `sms_sender_address` to match the Address displayed in the StartHere SMS Gateway app. For example:
 
 ```json
 {
@@ -25,15 +24,14 @@ Set the `sms_sender_address` inside `src/main/resources/config.sample.json` to m
 }
 ```
 
-3. Update docker-compose with your local IP address:
+3. Create the webapp configuration:
+Copy the file `webapp/config.example.js` to `webapp/config.js`
+
+4. Update docker-compose.yml with your local IP address:
 Set the `- "--url=http://ip-address:8088"` parameter inside `docker-compose.yml` to match the IP address of your development machine. For example:
 ```yml
-{
-  ...
     entrypoint:
       - "--url=http://192.168.1.105:8088" 
-  ...
-}
 ```
 Note: do not use `127.0.0.1` or `0.0.0.0` as IP addresses as this will result in the app not being able to find the issuer.
 
@@ -78,7 +76,12 @@ You can run the tests, defined in `src/test/java/foundation/privacybydesign/sms/
 $ gradle test
 ```
 
+
 ### Run
+Make sure you have an irma server up and running as issuer and, a valid `webapp/build/assets/config.js` and `src/main/resources/config.json` and keys. How this needs to be configured can be seen inside the Docker files. Then, run:
+
 ```bash
 $ gradle appRun
 ```
+
+To open the webapp navigate to `http://localhost:8080/irma_sms_issuer`. The API is accessible via `http://localhost:8080/irma_sms_issuer/api`
