@@ -15,7 +15,7 @@ COPY ./ /app/
 WORKDIR /app
 RUN gradle build
 
-FROM tomee:9.0-jre11
+FROM tomee:9.1-jre11
 
 # Copy the webapp to the webapps directory
 COPY --from=webappbuild /webapp/build/ /usr/local/tomee/webapps/ROOT/
