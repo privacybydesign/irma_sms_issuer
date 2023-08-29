@@ -11,8 +11,6 @@ services:
       - 8088:8088
     expose:
       - 8088
-    networks:
-      - irma-net
     entrypoint:
       - "irma"
       - "server"
@@ -43,12 +41,3 @@ services:
         - 8080:8080
       expose:
         - 8080
-      networks:
-        - irma-net
-
-# Docker Desktop for MacOS does not support exposing ports when using host networking. Therefore,
-# we have to use bridge networking and expose the ports manually.
-# https://github.com/docker/for-mac/issues/1031
-networks:
-  irma-net:
-    driver: bridge
