@@ -65,10 +65,10 @@ public class BaseConfiguration<T> {
     }
 
     public static byte[] getResource(String filename) throws IOException {
-        return convertSteamToByteArray(getResourceStream(filename), 2048);
+        return convertStreamToByteArray(getResourceStream(filename), 2048);
     }
 
-    public static byte[] convertSteamToByteArray(InputStream stream, int size) throws IOException {
+    public static byte[] convertStreamToByteArray(InputStream stream, int size) throws IOException {
         byte[] buffer = new byte[size];
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
