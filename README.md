@@ -2,10 +2,17 @@
 The IRMA SMS issuer takes care of issuing a mobile phone number to [Yivi app](https://github.com/privacybydesign/irmamobile) users. It consists of a Java backend API, which connects to an [irma server (issuer)](https://github.com/privacybydesign/irmago) and an SMS gateway service, and a frontend web app.
 
 # Running (development)
-The easiest way to run the irma_sms_issuer for development purposes is by having an Android phone with the Yivi app installed and Docker.
+The easiest way to run the irma_sms_issuer for development purposes is by having a phone with the Yivi app installed and Docker.
 
-### Set up local SMS messaging gateway (Android only):
-Make sure your development machine and phone are on the same network. Install [StartHere SMS Gateway App](https://m.apkpure.com/starthere-sms-gateway-app/com.bogdan.sms) on your Android device. When the app is started, it runs a local server imitating an SMS sending gateway. SMS messages, in the form of POST requests coming from irma_sms_issuer, are sent to this messaging service and will be displayed inside the app. 
+### Setup listening for SMS messages:
+Make sure your development machine and phone are on the same network.
+
+To be able to get the verification code execute the following command in a separate terminal to intercept relevant local traffic:
+```bash
+$ while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; sh test;  } | nc -l 8766; done
+```
+
+If you have an Android device you can also install [StartHere SMS Gateway App](https://m.apkpure.com/starthere-sms-gateway-app/com.bogdan.sms). This will give you a more visual experience. When the app is started, it runs a local server imitating an SMS sending gateway. SMS messages, in the form of POST requests coming from irma_sms_issuer, are sent to this messaging service and will be displayed inside the app.
 
 ### Configuration
 Various configuration files, keys and settings need to be in place to be able to build and run the apps.
@@ -16,7 +23,7 @@ $ utils/keygen.sh
 ```
 
 2. Create the Java app configuration:
-Copy the file `src/main/resources/config.sample.json` to `src/main/resources/config.json` and set the `sms_sender_address` to match the Address displayed in the StartHere SMS Gateway app. For example:
+Copy the file `src/main/resources/config.sample.json` to `src/main/resources/config.json` and set the `sms_sender_address` to match the IP address of your localhost or the Address displayed in the StartHere SMS Gateway app. For example:
 
 ```json
 {
@@ -31,7 +38,7 @@ Copy the file `webapp/config.example.js` to `webapp/config.js`
 Set the `- "--url=http://ip-address:8088"` parameter inside `docker-compose.yml` to match the IP address of your development machine. For example:
 ```yml
     entrypoint:
-      - "--url=http://192.168.1.105:8088" 
+      - "--url=http://192.168.1.105:8088"
 ```
 Note: do not use `127.0.0.1` or `0.0.0.0` as IP addresses as this will result in the app not being able to find the issuer.
 
@@ -46,11 +53,7 @@ By default, docker-compose caches docker images, so on a second run the previous
 $ docker-compose up --build
 ```
 
-### Open browser
-To test the complete flow, you need to use a browser which runs in insecure mode. This is required to bypass CORS issues. The example below launches Google Chrome browser on a Mac at `http://localhost:8080` with web-security disabled:
-```bash
-$ open -n -a Google\ Chrome --args --user-data-dir=/tmp/temp_chrome_user_data_dir http://localhost:8080/ --disable-web-security
-```
+Navigate to `http://localhost:8080` in your browser and follow the instructions to test the complete flow.
 
 ## Manually
 The java api and JavaScript frontend can be built and run manually. To do so:
