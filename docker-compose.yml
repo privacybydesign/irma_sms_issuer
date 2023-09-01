@@ -5,7 +5,6 @@ services:
   # Irma issuer service
   irmaserver:
     image: ghcr.io/privacybydesign/irma:v0.13.1
-    container_name: irma_server
     working_dir: /irmago
     ports:
       - 8088:8088
@@ -18,9 +17,9 @@ services:
       - "--requestors={\"irma_sms_issuer\":{\"auth_method\":\"publickey\",\"key_file\": \"/config/pk.pem\"} }"
       - "--port=8088"
       - "--jwt-privkey-file=/config/sk.pem"
-      - "--url=http://ip-address:8088" # Your localhost IP-address here. This is required for the app to be able to connect to the issuer
+      - "--url=http://${IP}:8088"
     volumes:
-      - ./build/resources/main/:/config/
+      - ./src/main/resources/:/config/
 
   # Service that runs the SMS issuer webapp and api
   irma_sms_issuer:
@@ -28,15 +27,13 @@ services:
       build: 
         context: .
         dockerfile: Dockerfile
-      container_name: irma_sms_issuer
       environment:
          - IRMA_CONF=/config/
       volumes:
-        # Make keys and config.json available in the container
-        - ./build/resources/main/:/config/
-        - ./src/main/resources/config.json:/config/config.json
-        # Make config.js available in the container
-        - ./webapp/config.js:/usr/local/tomee/webapps/ROOT/assets/config.js:ro" 
+        # Make keys and config.json available to Java app
+        - ./src/main/resources/:/config/
+        # Make config.js available to webapp
+        - ./webapp/config.example.js:/usr/local/tomee/webapps/ROOT/assets/config.js:ro" 
       ports:
         - 8080:8080
       expose:
