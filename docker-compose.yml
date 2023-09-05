@@ -1,0 +1,40 @@
+version: "3.8"
+name: irma_sms_issuer
+
+services:
+  # Irma issuer service
+  irmaserver:
+    image: ghcr.io/privacybydesign/irma:v0.13.1
+    working_dir: /irmago
+    ports:
+      - 8088:8088
+    expose:
+      - 8088
+    entrypoint:
+      - "irma"
+      - "server"
+      - "--no-auth=false"
+      - "--requestors={\"irma_sms_issuer\":{\"auth_method\":\"publickey\",\"key_file\": \"/config/pk.pem\"} }"
+      - "--port=8088"
+      - "--jwt-privkey-file=/config/sk.pem"
+      - "--url=http://${IP}:8088"
+    volumes:
+      - ./src/main/resources/:/config/
+
+  # Service that runs the SMS issuer webapp and api
+  irma_sms_issuer:
+      platform: linux/x86_64 
+      build: 
+        context: .
+        dockerfile: Dockerfile
+      environment:
+         - IRMA_CONF=/config/
+      volumes:
+        # Make keys and config.json available to Java app
+        - ./src/main/resources/:/config/
+        # Make config.js available to webapp
+        - ./webapp/config.example.js:/usr/local/tomee/webapps/ROOT/assets/config.js:ro" 
+      ports:
+        - 8080:8080
+      expose:
+        - 8080

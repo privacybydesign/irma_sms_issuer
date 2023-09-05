@@ -1,6 +1,6 @@
 package foundation.privacybydesign.sms;
 
-import foundation.privacybydesign.common.BaseConfiguration;
+import foundation.privacybydesign.sms.common.BaseConfiguration;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.irmacard.api.common.util.GsonUtil;
 
@@ -13,7 +13,7 @@ import java.security.PrivateKey;
  * Configuration manager. The config itself is stored in config.json, which
  * is probably located in build/resources/main.
  */
-public class SMSConfiguration extends BaseConfiguration {
+public class SMSConfiguration extends BaseConfiguration<SMSConfiguration> {
     static SMSConfiguration instance;
     static final String CONFIG_FILENAME = "config.json";
     static {

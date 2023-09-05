@@ -1,6 +1,5 @@
 package foundation.privacybydesign.sms;
 
-import foundation.privacybydesign.common.CryptoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,12 +59,13 @@ public class TokenManager {
             logger.error("Phone number not found");
             return false;
         }
+
         if (tr.isExpired()) {
             // Expired, but not yet cleaned out by periodicCleanup()
             logger.error("Token expired");
             return false;
         }
-        if (!CryptoUtil.isEqualsConstantTime(tr.token.toCharArray(), token.toCharArray())) {
+        if (!isEqualsConstantTime(tr.token.toCharArray(), token.toCharArray())) {
             tr.tries++;
             logger.error("Token is wrong");
             return false;
@@ -78,6 +78,21 @@ public class TokenManager {
         }
         tokenMap.remove(phone);
         return true;
+    }
+
+    /**
+     * Compare two byte arrays in constant time.
+     */
+    public static boolean isEqualsConstantTime(char[] a, char[] b) {
+        if (a.length != b.length) {
+            return false;
+        }
+
+        byte result = 0;
+        for (int i = 0; i < a.length; i++) {
+            result |= a[i] ^ b[i];
+        }
+        return result == 0;
     }
 
     void periodicCleanup() {

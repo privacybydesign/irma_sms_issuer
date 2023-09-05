@@ -14,9 +14,11 @@ public abstract class Sender {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
         Formatter formatter = new Formatter();
-        return formatter.format(conf.getSMSTemplate(language),
+        String format = formatter.format(conf.getSMSTemplate(language),
                 token, phone + ":" + token)
                 .toString();
+        formatter.close();
+        return format;
     }
 
     abstract protected void sendMessage(String phone, String message) throws IOException;
