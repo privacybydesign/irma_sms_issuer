@@ -6,9 +6,9 @@ The easiest way to run the irma_sms_issuer for development purposes is by having
 
 ### Setup listening for SMS messages:
 
-To be able to get the verification code execute the following command in a separate terminal to intercept relevant local traffic:
+To be able to get the verification code execute [socat](http://www.dest-unreach.org/socat) in a separate terminal to intercept relevant local traffic:
 ```bash
-$ while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; sh test;  } | nc -l 8766; done
+$ socat -v TCP-LISTEN:8766,crlf,reuseaddr,fork SYSTEM:"echo HTTP/1.1 200"
 ```
 
 If you have an Android device you can also install [StartHere SMS Gateway App](https://m.apkpure.com/starthere-sms-gateway-app/com.bogdan.sms). This will give you a more visual experience. Make sure your development machine and phone are on the same network. And then, when the app is started, it runs a local server imitating an SMS sending gateway. SMS messages, in the form of POST requests coming from irma_sms_issuer, are sent to this messaging service and will be displayed inside the app.
