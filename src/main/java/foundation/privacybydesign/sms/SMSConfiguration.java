@@ -33,6 +33,7 @@ public class SMSConfiguration extends BaseConfiguration<SMSConfiguration> {
     private String sms_sender_number = "";
     private long token_validity = 0;
     private Map<String, String> sms_templates = null;
+    private String private_key_path = "sk.der";
     private String server_name = "";
     private String human_readable_name = "";
     private String scheme_manager = "";
@@ -57,52 +58,91 @@ public class SMSConfiguration extends BaseConfiguration<SMSConfiguration> {
         }
     }
 
-    public String getSMSSenderBackend() {return sms_sender_backend; }
+    public String getSMSSenderBackend() {
+        return sms_sender_backend;
+    }
 
-    public String getSMSSenderHost() {return sms_sender_ssh_host; }
+    public String getSMSSenderHost() {
+        return sms_sender_ssh_host;
+    }
 
-    public String getSMSSenderHostRsaKey() {return sms_sender_ssh_host_rsa_key; }
+    public String getSMSSenderHostRsaKey() {
+        return sms_sender_ssh_host_rsa_key;
+    }
 
-    public String getSMSSenderUser() {return sms_sender_ssh_user; }
+    public String getSMSSenderUser() {
+        return sms_sender_ssh_user;
+    }
 
-    public String getSMSSenderKeyPath() {return sms_sender_ssh_key_path; }
+    public String getSMSSenderKeyPath() {
+        return sms_sender_ssh_key_path;
+    }
 
-    public String getSMSSenderKeyPassphrase() {return sms_sender_ssh_key_passphrase; }
+    public String getSMSSenderKeyPassphrase() {
+        return sms_sender_ssh_key_passphrase;
+    }
 
-    public String getSMSSenderAddress() {return sms_sender_address; }
+    public String getSMSSenderAddress() {
+        return sms_sender_address;
+    }
 
-    public String getSMSSenderParamPhone() { return sms_sender_param_phone; }
+    public String getSMSSenderParamPhone() {
+        return sms_sender_param_phone;
+    }
 
-    public String getSMSSenderParamMessage() { return sms_sender_param_message; }
+    public String getSMSSenderParamMessage() {
+        return sms_sender_param_message;
+    }
 
-    public String getSMSSenderNumber() { return sms_sender_number; }
+    public String getSMSSenderNumber() {
+        return sms_sender_number;
+    }
 
-    public int getSMSSenderTimeout() { return sms_sender_timeout; }
+    public int getSMSSenderTimeout() {
+        return sms_sender_timeout;
+    }
 
-    public long getSMSTokenValidity() { return token_validity; }
+    public long getSMSTokenValidity() {
+        return token_validity;
+    }
 
-    public String getSMSTemplate(String language) { return sms_templates.get(language); }
+    public String getSMSTemplate(String language) {
+        return sms_templates.get(language);
+    }
 
-    public String getServerName() { return server_name; }
+    public String getServerName() {
+        return server_name;
+    }
 
-    public String getHumanReadableName() { return human_readable_name; }
+    public String getHumanReadableName() {
+        return human_readable_name;
+    }
 
-    public String getSchemeManager() { return scheme_manager; }
+    public String getSchemeManager() {
+        return scheme_manager;
+    }
 
-    public String getSMSIssuer() { return sms_issuer; }
+    public String getSMSIssuer() {
+        return sms_issuer;
+    }
 
-    public String getSMSCredential() { return sms_credential; }
+    public String getSMSCredential() {
+        return sms_credential;
+    }
 
-    public String getSMSAttribute() { return sms_attribute; }
+    public String getSMSAttribute() {
+        return sms_attribute;
+    }
 
-    public SignatureAlgorithm getJwtAlgorithm() { return SignatureAlgorithm.RS256; }
+    public SignatureAlgorithm getJwtAlgorithm() {
+        return SignatureAlgorithm.RS256;
+    }
 
     public CMGatewayConfiguration getCMGatewayConfiguration() {
         return cm;
     }
 
     public PrivateKey getPrivateKey() throws KeyManagementException {
-        return BaseConfiguration.getPrivateKey("sk.der");
+        return BaseConfiguration.getPrivateKey(private_key_path);
     }
 }
-

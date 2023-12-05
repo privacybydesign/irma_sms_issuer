@@ -57,9 +57,6 @@ jobs:
         - name: Build
           run: ./gradlew build
 
-        - name: Remove version number from WAR
-          run: mv build/libs/irma_sms_issuer-*.war build/libs/irma_sms_issuer.war
-
         - uses: actions/upload-artifact@v3
           with:
             name: war
