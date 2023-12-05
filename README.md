@@ -37,6 +37,8 @@ $ IP=192.168.1.105 docker-compose up
 ```
 Note: do not use `127.0.0.1` or `0.0.0.0` as IP addresses as this will result in the app not being able to find the issuer.
 
+The configuration should be mounted in the `/config` directory of the container. The `docker-compose.yml` file already contains this configuration.
+
 By default, docker-compose caches docker images, so on a second run the previous built images will be used. A fresh build can be enforced using the --build flag.
 ```bash
 $ IP=192.168.1.105 docker-compose up --build

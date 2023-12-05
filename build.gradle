@@ -18,6 +18,10 @@ buildscript {
     }
 }
 
+war {
+    archiveName 'irma_sms_issuer.war'
+}
+
 repositories {
     maven {
         url "https://credentials.github.io/repos/maven2/"

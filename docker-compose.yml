@@ -33,7 +33,7 @@ services:
         # Make keys and config.json available to Java app
         - ./src/main/resources/:/config/
         # Make config.js available to webapp
-        - ./webapp/config.example.js:/usr/local/tomee/webapps/ROOT/assets/config.js:ro" 
+        - ./webapp/config.example.js:/config/config.js:ro" 
       ports:
         - 8080:8080
       expose:
