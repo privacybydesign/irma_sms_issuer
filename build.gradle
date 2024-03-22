@@ -47,7 +47,7 @@ dependencies {
     // Source dependencies. Check settings.gradle for the source repositories.
     implementation 'org.irmacard.api:irma_api_common:v2.0.1'
 
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.1'
 }
 
 configurations.all {
