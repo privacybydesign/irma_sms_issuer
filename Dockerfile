@@ -28,6 +28,8 @@ COPY --from=webappbuild /www/ /usr/local/tomee/webapps/ROOT/
 # Copy the war file to the webapps directory
 COPY --from=javabuild /app/build/libs/irma_sms_issuer.war /usr/local/tomee/webapps/
 
+RUN mkdir /usr/local/keys
+
 ENV IRMA_CONF="/config/"
 EXPOSE 8080
 
