@@ -32,4 +32,4 @@ ENV IRMA_CONF="/config/"
 EXPOSE 8080
 
 # Copy the config file to the webapp. This is done at runtime so that the config file can be mounted as a volume.
-CMD [ "/bin/sh", "-c", "for lang in 'en' 'nl'; do cp /config/config.js /usr/local/tomee/webapps/ROOT/$lang/assets/config.js; done && exec catalina.sh run" ]
+CMD [ "/bin/sh", "-c", "openssl rsa -in /irma-jwt-key/priv.pem -outform der -out /usr/local/keys/priv.der && for lang in 'en' 'nl'; do cp /config/config.js /usr/local/tomee/webapps/ROOT/$lang/assets/config.js; done && exec catalina.sh run" ]
