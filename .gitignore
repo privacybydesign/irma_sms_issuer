@@ -11,3 +11,7 @@ artifacts
 .idea/
 bin/
 .DS_Store
+.classpath
+.devcontainer
+.project
+.settings

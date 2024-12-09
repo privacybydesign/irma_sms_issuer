@@ -1,5 +1,5 @@
 
-FROM node:20 as webappbuild
+FROM node:20 AS webappbuild
 
 # Build the webapp
 COPY ./webapp/ /webapp/
