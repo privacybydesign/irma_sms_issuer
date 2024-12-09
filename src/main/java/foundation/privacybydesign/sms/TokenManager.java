@@ -5,8 +5,12 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import redis.clients.jedis.*;
+import redis.clients.jedis.params.ScanParams;
+import redis.clients.jedis.resps.ScanResult;
 
 /**
  * Generate and verify tokens sent in the SMS message.
@@ -18,11 +22,11 @@ public class TokenManager {
 
     // Map to store sent tokens.
     // Format: {"phone": TokenRequest}
-    private final Map<String, TokenRequest> tokenMap;
+    private final TokenRequestRepository tokenMap;
     private final SecureRandom random;
 
     public TokenManager() {
-        tokenMap = new ConcurrentHashMap<>();
+        tokenMap = new InMemoryTokenRequestRepository();
         random = new SecureRandom();
     }
 
@@ -49,12 +53,12 @@ public class TokenManager {
         token = token.replace('O', 'X');
         token = token.replace('1', 'Y');
         token = token.replace('I', 'Z');
-        tokenMap.put(phone, new TokenRequest(token));
+        tokenMap.store(phone, new TokenRequest(token));
         return token;
     }
 
     public boolean verify(String phone, String token) {
-        TokenRequest tr = tokenMap.get(phone);
+        TokenRequest tr = tokenMap.retrieve(phone);
         if (tr == null) {
             logger.error("Phone number not found");
             return false;
@@ -96,19 +100,20 @@ public class TokenManager {
     }
 
     void periodicCleanup() {
-        // Use enhanced for loop, because an iterator makes sure concurrency issues cannot occur.
-        for (Map.Entry<String, TokenRequest> entry : tokenMap.entrySet()) {
-            if (entry.getValue().isExpired()) {
-                tokenMap.remove(entry.getKey());
-            }
-        }
+        tokenMap.removeExpired();
     }
 }
 
 class TokenRequest {
     String token;
     int tries;
-    private long created;
+    long created;
+
+    TokenRequest(String token, int tries, long created) {
+        this.token = token;
+        this.tries = tries;
+        this.created = created;
+    }
 
     TokenRequest(String token) {
         this.token = token;
@@ -116,8 +121,136 @@ class TokenRequest {
         tries = 0;
     }
 
+    static boolean isExpiredForCreationDate(long creationDate) {
+        return System.currentTimeMillis() - creationDate > SMSConfiguration.getInstance().getSMSTokenValidity() * 1000;
+    }
+
     boolean isExpired() {
-        return System.currentTimeMillis() - this.created >
-                SMSConfiguration.getInstance().getSMSTokenValidity()*1000;
+        return isExpiredForCreationDate(created);
+    }
+}
+
+interface TokenRequestRepository {
+    void store(String phone, TokenRequest request);
+
+    TokenRequest retrieve(String phone);
+
+    void remove(String phone);
+
+    void removeExpired();
+}
+
+class RedisConfig {
+    String host;
+    int port;
+    String username;
+    String masterName;
+    String password;
+
+    RedisConfig(String host, int port, String masterName, String username, String password) {
+        this.host = host;
+        this.port = port;
+        this.masterName = masterName;
+        this.username = username;
+        this.password = password;
+    }
+
+    static RedisConfig fromEnv() {
+        String host = System.getenv("REDIS_HOST");
+        int port = Integer.parseInt(System.getenv("REDIS_PORT"));
+        String username = System.getenv("REDIS_USERNAME");
+        String password = System.getenv("REDIS_PASSWORD");
+        String masterName = System.getenv("REDIS_MASTER_NAME");
+        return new RedisConfig(host, port, masterName, username, password);
+    }
+}
+
+class RedisTokenRequestRepository implements TokenRequestRepository {
+    final String keyPrefix = "sms-issuer:";
+    JedisPooled client;
+
+    RedisTokenRequestRepository(RedisConfig redisConfig) {
+        HostAndPort address = new HostAndPort(redisConfig.host, redisConfig.port);
+        JedisClientConfig config = DefaultJedisClientConfig.builder()
+                .ssl(false)
+                .user(redisConfig.username)
+                .password(redisConfig.password)
+                .build();
+        client = new JedisPooled(address, config);
+    }
+
+    @Override
+    public void store(String phone, TokenRequest request) {
+        final String key = keyPrefix + phone;
+        client.hset(key, "token", request.token);
+        client.hset(key, "tries", Integer.toString(request.tries));
+        client.hset(key, "created", String.valueOf(request.created));
+    }
+
+    @Override
+    public void remove(String phone) {
+        final String key = keyPrefix + phone;
+        client.del(key);
+    }
+
+    @Override
+    public void removeExpired() {
+        final String pattern = keyPrefix + "*";
+        ScanParams scanParams = new ScanParams().match(pattern);
+        String cursor = "0";
+        do {
+            ScanResult<String> scanResult = client.scan(cursor, scanParams);
+            List<String> keys = scanResult.getResult();
+            cursor = scanResult.getCursor();
+
+            for (String key : keys) {
+                String createdStr = client.hget(key, "created");
+                if (createdStr != null) {
+                    long created = Long.parseLong(createdStr);
+                    if (TokenRequest.isExpiredForCreationDate(created)) {
+                        client.del(key);
+                    }
+                }
+            }
+        } while (!cursor.equals("0")); // continue until the cursor wraps around
+    }
+
+    @Override
+    public TokenRequest retrieve(String phone) {
+        final String key = keyPrefix + phone;
+        String token = client.hget(key, "token");
+        int tries = Integer.parseInt(client.hget(key, "tries"));
+        long created = Long.parseLong(client.hget(key, "created"));
+        return new TokenRequest(token, tries, created);
+    }
+}
+
+class InMemoryTokenRequestRepository implements TokenRequestRepository {
+    private final Map<String, TokenRequest> tokenMap = new ConcurrentHashMap<>();
+
+    @Override
+    public void store(String phone, TokenRequest request) {
+        tokenMap.put(phone, request);
+    }
+
+    @Override
+    public TokenRequest retrieve(String phone) {
+        return tokenMap.get(phone);
+    }
+
+    @Override
+    public void remove(String phone) {
+        tokenMap.remove(phone);
+    }
+
+    @Override
+    public void removeExpired() {
+        // Use enhanced for loop, because an iterator makes sure concurrency issues
+        // cannot occur.
+        for (Map.Entry<String, TokenRequest> entry : tokenMap.entrySet()) {
+            if (entry.getValue().isExpired()) {
+                tokenMap.remove(entry.getKey());
+            }
+        }
     }
 }
