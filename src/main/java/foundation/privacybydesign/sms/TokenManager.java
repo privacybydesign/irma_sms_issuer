@@ -187,15 +187,12 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
 
     RedisTokenRequestRepository(RedisConfig redisConfig) {
         HostAndPort address = new HostAndPort(redisConfig.host, redisConfig.port);
-        JedisClientConfig masterConfig = DefaultJedisClientConfig.builder()
+        JedisClientConfig config = DefaultJedisClientConfig.builder()
                 .ssl(false)
                 .user(redisConfig.username)
                 .password(redisConfig.password)
                 .build();
-
-        JedisClientConfig clientConfig = DefaultJedisClientConfig.builder().ssl(false).build();
-
-        pool = new JedisSentinelPool(redisConfig.masterName, Set.of(address), masterConfig, clientConfig);
+        pool = new JedisSentinelPool(redisConfig.masterName, Set.of(address), config, config);
     }
 
     @Override
