@@ -145,6 +145,7 @@ interface TokenRequestRepository {
 }
 
 class RedisConfig {
+    private static Logger logger = LoggerFactory.getLogger(RedisConfig.class);    
     String host;
     int port;
     String username;
@@ -162,11 +163,16 @@ class RedisConfig {
     static RedisConfig fromEnv() {
         String host = System.getenv("REDIS_HOST");
 
-        int port = Integer.parseInt(System.getenv("REDIS_PORT"));
-        String username = System.getenv("REDIS_USERNAME");
-        String password = System.getenv("REDIS_PASSWORD");
-        String masterName = System.getenv("REDIS_MASTER_NAME");
-        return new RedisConfig(host, port, masterName, username, password);
+        try {
+            int port = Integer.parseInt(System.getenv("REDIS_PORT"));
+            String username = System.getenv("REDIS_USERNAME");
+            String password = System.getenv("REDIS_PASSWORD");
+            String masterName = System.getenv("REDIS_MASTER_NAME");
+            return new RedisConfig(host, port, masterName, username, password);
+        } catch (NumberFormatException e) {
+            logger.error("failed to parse port as number: " + e.getMessage());
+            return null;
+        }
     }
 }
 
@@ -175,6 +181,7 @@ class RedisConfig {
  * Useful for when the sms issuer needs to be stateless.
  */
 class RedisTokenRequestRepository implements TokenRequestRepository {
+    private static Logger logger = LoggerFactory.getLogger(RedisTokenRequestRepository.class);    
     final String keyPrefix = "sms-issuer:";
     JedisSentinelPool pool;
 
@@ -220,15 +227,23 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
                 cursor = scanResult.getCursor();
 
                 for (String key : keys) {
-                    String createdStr = jedis.hget(key, "created");
-                    if (createdStr != null) {
-                        long created = Long.parseLong(createdStr);
-                        if (TokenRequest.isExpiredForCreationDate(created)) {
-                            jedis.del(key);
-                        }
-                    }
+                    removeIfExpired(jedis, key);
                 }
             } while (!cursor.equals("0")); // continue until the cursor wraps around
+        }
+    }
+
+    void removeIfExpired(Jedis jedis, String key) {
+        String createdStr = jedis.hget(key, "created");
+        if (createdStr != null) {
+            try {
+                long created = Long.parseLong(createdStr);
+                if (TokenRequest.isExpiredForCreationDate(created)) {
+                    jedis.del(key);
+                }
+            } catch (NumberFormatException e) {
+                logger.error("Failed to parse " + key + " creation into long: " + e.getMessage());
+            }
         }
     }
 
@@ -236,10 +251,15 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     public TokenRequest retrieve(String phone) {
         try (var jedis = pool.getResource()) {
             final String key = keyPrefix + phone;
-            String token = jedis.hget(key, "token");
-            int tries = Integer.parseInt(jedis.hget(key, "tries"));
-            long created = Long.parseLong(jedis.hget(key, "created"));
-            return new TokenRequest(token, tries, created);
+            try {
+                String token = jedis.hget(key, "token");
+                int tries = Integer.parseInt(jedis.hget(key, "tries"));
+                long created = Long.parseLong(jedis.hget(key, "created"));
+                return new TokenRequest(token, tries, created);
+            } catch (NumberFormatException e) {
+                logger.error("failed to parse for " + key + ": " + e.getMessage());
+                return null;
+            }
         }
     }
 }
