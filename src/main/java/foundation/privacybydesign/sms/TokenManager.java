@@ -182,7 +182,7 @@ class RedisConfig {
  */
 class RedisTokenRequestRepository implements TokenRequestRepository {
     private static Logger logger = LoggerFactory.getLogger(RedisTokenRequestRepository.class);    
-    final String keyPrefix = "sms-issuer:";
+    final String keyPrefix = getenv("REDIS_KEY_PREFIX") + ":";
     JedisSentinelPool pool;
 
     RedisTokenRequestRepository(RedisConfig redisConfig) {
