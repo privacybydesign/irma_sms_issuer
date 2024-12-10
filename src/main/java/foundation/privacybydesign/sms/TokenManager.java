@@ -193,7 +193,7 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
                 .password(redisConfig.password)
                 .build();
 
-        JedisClientConfig clientConfig = DefaultJedisClientConfig.builder().ssl(false).build();
+        JedisClientConfig clientConfig = DefaultJedisClientConfig.builder().ssl(false).password(redisConfig.password).build();
 
         pool = new JedisSentinelPool(redisConfig.masterName, Set.of(address), masterConfig, clientConfig);
     }
