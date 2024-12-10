@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import redis.clients.jedis.*;
 import redis.clients.jedis.params.ScanParams;
@@ -22,11 +23,11 @@ public class TokenManager {
 
     // Map to store sent tokens.
     // Format: {"phone": TokenRequest}
-    private final TokenRequestRepository tokenMap;
+    private final TokenRequestRepository tokenRepo;
     private final SecureRandom random;
 
     public TokenManager() {
-        tokenMap = new InMemoryTokenRequestRepository();
+        tokenRepo = new RedisTokenRequestRepository(RedisConfig.fromEnv());
         random = new SecureRandom();
     }
 
@@ -53,12 +54,12 @@ public class TokenManager {
         token = token.replace('O', 'X');
         token = token.replace('1', 'Y');
         token = token.replace('I', 'Z');
-        tokenMap.store(phone, new TokenRequest(token));
+        tokenRepo.store(phone, new TokenRequest(token));
         return token;
     }
 
     public boolean verify(String phone, String token) {
-        TokenRequest tr = tokenMap.retrieve(phone);
+        TokenRequest tr = tokenRepo.retrieve(phone);
         if (tr == null) {
             logger.error("Phone number not found");
             return false;
@@ -80,7 +81,7 @@ public class TokenManager {
             // TODO: report this error back to the user.
             return false;
         }
-        tokenMap.remove(phone);
+        tokenRepo.remove(phone);
         return true;
     }
 
@@ -100,7 +101,7 @@ public class TokenManager {
     }
 
     void periodicCleanup() {
-        tokenMap.removeExpired();
+        tokenRepo.removeExpired();
     }
 }
 
@@ -157,6 +158,7 @@ class RedisConfig {
 
     static RedisConfig fromEnv() {
         String host = System.getenv("REDIS_HOST");
+
         int port = Integer.parseInt(System.getenv("REDIS_PORT"));
         String username = System.getenv("REDIS_USERNAME");
         String password = System.getenv("REDIS_PASSWORD");
@@ -167,7 +169,7 @@ class RedisConfig {
 
 class RedisTokenRequestRepository implements TokenRequestRepository {
     final String keyPrefix = "sms-issuer:";
-    JedisPooled client;
+    JedisSentinelPool pool;
 
     RedisTokenRequestRepository(RedisConfig redisConfig) {
         HostAndPort address = new HostAndPort(redisConfig.host, redisConfig.port);
@@ -176,21 +178,26 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
                 .user(redisConfig.username)
                 .password(redisConfig.password)
                 .build();
-        client = new JedisPooled(address, config);
+        pool = new JedisSentinelPool(redisConfig.masterName, Set.of(address), config, config);
     }
 
     @Override
     public void store(String phone, TokenRequest request) {
         final String key = keyPrefix + phone;
-        client.hset(key, "token", request.token);
-        client.hset(key, "tries", Integer.toString(request.tries));
-        client.hset(key, "created", String.valueOf(request.created));
+        try (var jedis = pool.getResource()) {
+            jedis.hset(key, "token", request.token);
+            jedis.hset(key, "tries", Integer.toString(request.tries));
+            jedis.hset(key, "created", String.valueOf(request.created));
+        }
     }
 
     @Override
     public void remove(String phone) {
         final String key = keyPrefix + phone;
-        client.del(key);
+
+        try (var jedis = pool.getResource()) {
+            jedis.del(key);
+        }
     }
 
     @Override
@@ -198,30 +205,35 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
         final String pattern = keyPrefix + "*";
         ScanParams scanParams = new ScanParams().match(pattern);
         String cursor = "0";
-        do {
-            ScanResult<String> scanResult = client.scan(cursor, scanParams);
-            List<String> keys = scanResult.getResult();
-            cursor = scanResult.getCursor();
 
-            for (String key : keys) {
-                String createdStr = client.hget(key, "created");
-                if (createdStr != null) {
-                    long created = Long.parseLong(createdStr);
-                    if (TokenRequest.isExpiredForCreationDate(created)) {
-                        client.del(key);
+        try (var jedis = pool.getResource()) {
+            do {
+                ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+                List<String> keys = scanResult.getResult();
+                cursor = scanResult.getCursor();
+
+                for (String key : keys) {
+                    String createdStr = jedis.hget(key, "created");
+                    if (createdStr != null) {
+                        long created = Long.parseLong(createdStr);
+                        if (TokenRequest.isExpiredForCreationDate(created)) {
+                            jedis.del(key);
+                        }
                     }
                 }
-            }
-        } while (!cursor.equals("0")); // continue until the cursor wraps around
+            } while (!cursor.equals("0")); // continue until the cursor wraps around
+        }
     }
 
     @Override
     public TokenRequest retrieve(String phone) {
-        final String key = keyPrefix + phone;
-        String token = client.hget(key, "token");
-        int tries = Integer.parseInt(client.hget(key, "tries"));
-        long created = Long.parseLong(client.hget(key, "created"));
-        return new TokenRequest(token, tries, created);
+        try (var jedis = pool.getResource()) {
+            final String key = keyPrefix + phone;
+            String token = jedis.hget(key, "token");
+            int tries = Integer.parseInt(jedis.hget(key, "tries"));
+            long created = Long.parseLong(jedis.hget(key, "created"));
+            return new TokenRequest(token, tries, created);
+        }
     }
 }
 
