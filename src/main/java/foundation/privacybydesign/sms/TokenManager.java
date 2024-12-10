@@ -131,6 +131,9 @@ class TokenRequest {
     }
 }
 
+/**
+ * An interface for a repository to store tokens in.
+ */
 interface TokenRequestRepository {
     void store(String phone, TokenRequest request);
 
@@ -167,6 +170,10 @@ class RedisConfig {
     }
 }
 
+/**
+ * A token repository that stores and retrieves tokens from a redis store.
+ * Useful for when the sms issuer needs to be stateless.
+ */
 class RedisTokenRequestRepository implements TokenRequestRepository {
     final String keyPrefix = "sms-issuer:";
     JedisSentinelPool pool;
@@ -237,6 +244,10 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     }
 }
 
+/**
+ * A token repository that stores tokens in RAM. 
+ * Should not be used when the sms issuer needs to be stateless.
+ */
 class InMemoryTokenRequestRepository implements TokenRequestRepository {
     private final Map<String, TokenRequest> tokenMap = new ConcurrentHashMap<>();
 
