@@ -211,7 +211,7 @@ public class RedisRateLimit extends RateLimit {
                             jedis.del(key);
                         }
                     } catch (NumberFormatException e) {
-                        LOG.error("failed to parse: ", e.getMessage());
+                        LOG.error("failed to parse: " + e.getMessage());
                     }
                 }
             } while (!cursor.equals("0")); // continue until the cursor wraps around
