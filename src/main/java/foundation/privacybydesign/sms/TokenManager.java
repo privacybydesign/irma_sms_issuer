@@ -3,11 +3,12 @@ package foundation.privacybydesign.sms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import foundation.privacybydesign.sms.redis.Redis;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import redis.clients.jedis.*;
 import redis.clients.jedis.params.ScanParams;
@@ -27,7 +28,7 @@ public class TokenManager {
     private final SecureRandom random;
 
     public TokenManager() {
-        tokenRepo = new RedisTokenRequestRepository(RedisConfig.fromEnv());
+        tokenRepo = new RedisTokenRequestRepository();
         random = new SecureRandom();
     }
 
@@ -144,60 +145,22 @@ interface TokenRequestRepository {
     void removeExpired();
 }
 
-class RedisConfig {
-    private static Logger logger = LoggerFactory.getLogger(RedisConfig.class);    
-    String host;
-    int port;
-    String username;
-    String masterName;
-    String password;
-
-    RedisConfig(String host, int port, String masterName, String username, String password) {
-        this.host = host;
-        this.port = port;
-        this.masterName = masterName;
-        this.username = username;
-        this.password = password;
-    }
-
-    static RedisConfig fromEnv() {
-        String host = System.getenv("REDIS_HOST");
-
-        try {
-            int port = Integer.parseInt(System.getenv("REDIS_PORT"));
-            String username = System.getenv("REDIS_USERNAME");
-            String password = System.getenv("REDIS_PASSWORD");
-            String masterName = System.getenv("REDIS_MASTER_NAME");
-            return new RedisConfig(host, port, masterName, username, password);
-        } catch (NumberFormatException e) {
-            logger.error("failed to parse port as number: " + e.getMessage());
-            return null;
-        }
-    }
-}
-
 /**
  * A token repository that stores and retrieves tokens from a redis store.
  * Useful for when the sms issuer needs to be stateless.
  */
 class RedisTokenRequestRepository implements TokenRequestRepository {
-    private static Logger logger = LoggerFactory.getLogger(RedisTokenRequestRepository.class);    
-    final String keyPrefix = System.getenv("REDIS_KEY_PREFIX") + ":";
+    private static Logger logger = LoggerFactory.getLogger(RedisTokenRequestRepository.class);
+    private static String namespace = "request";
     JedisSentinelPool pool;
 
-    RedisTokenRequestRepository(RedisConfig redisConfig) {
-        HostAndPort address = new HostAndPort(redisConfig.host, redisConfig.port);
-        JedisClientConfig config = DefaultJedisClientConfig.builder()
-                .ssl(false)
-                .user(redisConfig.username)
-                .password(redisConfig.password)
-                .build();
-        pool = new JedisSentinelPool(redisConfig.masterName, Set.of(address), config, config);
+    RedisTokenRequestRepository() {
+        pool = Redis.createSentinelPoolFromEnv();
     }
 
     @Override
     public void store(String phone, TokenRequest request) {
-        final String key = keyPrefix + phone;
+        final String key = Redis.createKey(namespace, phone);
         try (var jedis = pool.getResource()) {
             jedis.hset(key, "token", request.token);
             jedis.hset(key, "tries", Integer.toString(request.tries));
@@ -207,7 +170,7 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
 
     @Override
     public void remove(String phone) {
-        final String key = keyPrefix + phone;
+        final String key = Redis.createKey(namespace, phone);
 
         try (var jedis = pool.getResource()) {
             jedis.del(key);
@@ -216,7 +179,7 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
 
     @Override
     public void removeExpired() {
-        final String pattern = keyPrefix + "*";
+        final String pattern = Redis.createNamespace(namespace) + "*";
         ScanParams scanParams = new ScanParams().match(pattern);
         String cursor = "0";
 
@@ -233,7 +196,7 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
         }
     }
 
-    void removeIfExpired(Jedis jedis, String key) {
+    private void removeIfExpired(Jedis jedis, String key) {
         String createdStr = jedis.hget(key, "created");
         if (createdStr != null) {
             try {
@@ -250,7 +213,7 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     @Override
     public TokenRequest retrieve(String phone) {
         try (var jedis = pool.getResource()) {
-            final String key = keyPrefix + phone;
+            final String key = Redis.createKey(namespace, phone);
             try {
                 String token = jedis.hget(key, "token");
                 int tries = Integer.parseInt(jedis.hget(key, "tries"));
@@ -265,7 +228,7 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
 }
 
 /**
- * A token repository that stores tokens in RAM. 
+ * A token repository that stores tokens in RAM.
  * Should not be used when the sms issuer needs to be stateless.
  */
 class InMemoryTokenRequestRepository implements TokenRequestRepository {
