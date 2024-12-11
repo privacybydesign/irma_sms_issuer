@@ -10,6 +10,10 @@ import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisClientConfig;
 import redis.clients.jedis.JedisSentinelPool;
 
+
+/**
+ * Some utilities for working with Redis.
+ */
 public class Redis {
     final private static Logger LOG = LoggerFactory.getLogger(Redis.class);
     final private static String KEY_PREFIX = System.getenv("REDIS_KEY_PREFIX") + ":";
@@ -18,10 +22,21 @@ public class Redis {
         return KEY_PREFIX + namespace + ":";
     }
 
+    /**
+     * Because Redis works with a flat map of keys and values, 
+     * some information needs to be added to the key in order to prevent duplicate keys.
+     * In this case we add the prefix for this component (e.g. sms-issuer) and then 
+     * a namespace for the different types inside this component (e.g. the token requests).
+     * They will be formatted in the following format: `<component>:<namespace>:<key>`
+     */
     public static String createKey(String namespace, String key) {
         return createNamespace(namespace) + key + ":";
     }
 
+    /**
+     * Creates a connection to a sentinel Redis using credentials loaded from environment variables.
+     * See the readme for the expected env vars.
+     */
     public static JedisSentinelPool createSentinelPoolFromEnv() {
         final Config redisConfig = configFromEnv();
         HostAndPort address = new HostAndPort(redisConfig.host, redisConfig.port);
@@ -63,5 +78,4 @@ public class Redis {
             return null;
         }
     }
-
 }
