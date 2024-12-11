@@ -1,6 +1,7 @@
 package foundation.privacybydesign.sms;
 
-import foundation.privacybydesign.sms.ratelimit.MemoryRateLimit;
+import foundation.privacybydesign.sms.ratelimit.RedisRateLimit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +26,11 @@ public class CleanupBackgroundJob implements ServletContextListener {
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
         scheduler.scheduleAtFixedRate(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 try {
                     TokenManager.getInstance().periodicCleanup();
-                    MemoryRateLimit.getInstance().periodicCleanup();
+                    RedisRateLimit.getInstance().periodicCleanup();
                 } catch (Exception e) {
                     logger.error("Failed to run periodic cleanup:");
                     e.printStackTrace();

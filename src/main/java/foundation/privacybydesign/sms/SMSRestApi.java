@@ -4,8 +4,8 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import foundation.privacybydesign.sms.ratelimit.InvalidPhoneNumberException;
-import foundation.privacybydesign.sms.ratelimit.MemoryRateLimit;
 import foundation.privacybydesign.sms.ratelimit.RateLimit;
+import foundation.privacybydesign.sms.ratelimit.RedisRateLimit;
 import foundation.privacybydesign.sms.smssender.CMGatewaySender;
 import foundation.privacybydesign.sms.smssender.SSHTunnelRESTSender;
 import foundation.privacybydesign.sms.smssender.Sender;
@@ -59,7 +59,7 @@ public class SMSRestApi {
     };
 
     public SMSRestApi() {
-        rateLimiter = MemoryRateLimit.getInstance();
+        rateLimiter = RedisRateLimit.getInstance();
     }
 
     public static String canonicalPhoneNumber(String phone)
@@ -75,7 +75,8 @@ public class SMSRestApi {
 
         for (String country : countries) {
             if (phoneUtil.isValidNumberForRegion(number, country)) {
-                // We should only go ahead if it is a mobile number, or if we can't tell wether it is a mobile number
+                // We should only go ahead if it is a mobile number, or if we can't tell wether
+                // it is a mobile number
                 PhoneNumberUtil.PhoneNumberType type = phoneUtil.getNumberType(number);
                 if (type == PhoneNumberUtil.PhoneNumberType.MOBILE ||
                         type == PhoneNumberUtil.PhoneNumberType.FIXED_LINE_OR_MOBILE ||
@@ -93,8 +94,8 @@ public class SMSRestApi {
     @Path("send")
     @Produces(MediaType.TEXT_PLAIN)
     public Response sendSmsCode(@Context HttpServletRequest req,
-                                @FormParam("phone") String phone,
-                                @FormParam("language") String language) {
+            @FormParam("phone") String phone,
+            @FormParam("language") String language) {
         try {
             phone = canonicalPhoneNumber(phone);
 
@@ -150,7 +151,7 @@ public class SMSRestApi {
     @Path("verify")
     @Produces(MediaType.TEXT_PLAIN)
     public Response verifySmsCode(@FormParam("phone") String phone,
-                                @FormParam("token") String token)
+            @FormParam("token") String token)
             throws KeyManagementException {
         SMSConfiguration conf = SMSConfiguration.getInstance();
 
@@ -172,15 +173,13 @@ public class SMSRestApi {
         attrs.put(conf.getSMSAttribute(), phone);
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, 1);
-        credentials.add(new CredentialRequest((int)CredentialRequest
+        credentials.add(new CredentialRequest((int) CredentialRequest
                 .floorValidityDate(calendar.getTimeInMillis(), true),
                 new CredentialIdentifier(
                         conf.getSchemeManager(),
                         conf.getSMSIssuer(),
-                        conf.getSMSCredential()
-                ),
-                attrs
-        ));
+                        conf.getSMSCredential()),
+                attrs));
 
         IdentityProviderRequest ipRequest = new IdentityProviderRequest("",
                 new IssuingRequest(null, null, credentials), 120);

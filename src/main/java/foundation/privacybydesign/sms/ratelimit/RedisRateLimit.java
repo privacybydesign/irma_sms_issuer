@@ -1,13 +1,17 @@
 package foundation.privacybydesign.sms.ratelimit;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import foundation.privacybydesign.sms.redis.Redis;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
+import redis.clients.jedis.params.ScanParams;
+import redis.clients.jedis.resps.ScanResult;
 
-class RedisRateLimit extends RateLimit {
+public class RedisRateLimit extends RateLimit {
     private static final long SECOND = 1000; // 1000ms = 1s
     private static final long MINUTE = SECOND * 60;
     private static final long HOUR = MINUTE * 60;
@@ -21,7 +25,7 @@ class RedisRateLimit extends RateLimit {
     final String ipLimitsNamespace = "ip-limits";
     final String phoneLimitsNamespace = "phone-limits:";
 
-    public RedisRateLimit getInstance() {
+    public static RedisRateLimit getInstance() {
         if (instance == null) {
             instance = new RedisRateLimit();
         }
@@ -160,6 +164,11 @@ class RedisRateLimit extends RateLimit {
         }
     }
 
+    public void periodicCleanup() {
+        cleanUpIpLimits();
+        cleanUpPhoneLimits();
+    }
+
     /**
      * @param jedis
      * @param key
@@ -180,4 +189,56 @@ class RedisRateLimit extends RateLimit {
         jedis.hset(key, "timestamp", Long.toString(limit.timestamp));
         jedis.hset(key, "tries", Integer.toString(limit.tries));
     }
+
+    private void cleanUpIpLimits() {
+        long now = System.currentTimeMillis();
+
+        final String pattern = Redis.createNamespace(ipLimitsNamespace) + "*";
+        ScanParams scanParams = new ScanParams().match(pattern);
+        String cursor = "0";
+
+        try (var jedis = pool.getResource()) {
+            do {
+                ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+                List<String> keys = scanResult.getResult();
+                cursor = scanResult.getCursor();
+
+                for (String key : keys) {
+                    String word = jedis.get(key);
+                    try {
+                        long value = Long.parseLong(word);
+                        if (value < startLimitIP(now)) {
+                            jedis.del(key);
+                        }
+                    } catch (NumberFormatException e) {
+                        LOG.error("failed to parse: ", e.getMessage());
+                    }
+                }
+            } while (!cursor.equals("0")); // continue until the cursor wraps around
+        }
+    }
+
+    private void cleanUpPhoneLimits() {
+        long now = System.currentTimeMillis();
+
+        final String pattern = Redis.createNamespace(phoneLimitsNamespace) + "*";
+        ScanParams scanParams = new ScanParams().match(pattern);
+        String cursor = "0";
+
+        try (var jedis = pool.getResource()) {
+            do {
+                ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+                List<String> keys = scanResult.getResult();
+                cursor = scanResult.getCursor();
+
+                for (String key : keys) {
+                    Limit limit = limitFromRedis(jedis, key);
+                    if (limit != null && limit.timestamp < now - 5 * DAY) {
+                        jedis.del(key);
+                    }
+                }
+            } while (!cursor.equals("0")); // continue until the cursor wraps around
+        }
+    }
+
 }
