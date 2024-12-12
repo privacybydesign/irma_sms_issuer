@@ -29,7 +29,7 @@ public class TokenManager {
 
     public TokenManager() {
         final String storageType = System.getenv("STORAGE_TYPE");
-        if (storageType == "redis") {
+        if (storageType.equals("redis")) {
             LOG.info("using Redis token request repository");
             tokenRepo = new RedisTokenRequestRepository();
         } else {

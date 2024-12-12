@@ -25,7 +25,7 @@ public class RedisRateLimit extends RateLimit {
     final String ipLimitsNamespace = "ip-limits";
     final String phoneLimitsNamespace = "phone-limits:";
 
-    public static RedisRateLimit getInstance() {
+    public static RateLimit getInstance() {
         if (instance == null) {
             instance = new RedisRateLimit();
         }
@@ -164,6 +164,7 @@ public class RedisRateLimit extends RateLimit {
         }
     }
 
+    @Override
     public void periodicCleanup() {
         cleanUpIpLimits();
         cleanUpPhoneLimits();
