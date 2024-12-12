@@ -20,7 +20,7 @@ import redis.clients.jedis.resps.ScanResult;
  */
 public class TokenManager {
     static private TokenManager instance;
-    private static final Logger logger = LoggerFactory.getLogger(TokenManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TokenManager.class);
 
     // Map to store sent tokens.
     // Format: {"phone": TokenRequest}
@@ -28,7 +28,14 @@ public class TokenManager {
     private final SecureRandom random;
 
     public TokenManager() {
-        tokenRepo = new RedisTokenRequestRepository();
+        final String storageType = System.getenv("STORAGE_TYPE");
+        if (storageType == "redis") {
+            LOG.info("using Redis token request repository");
+            tokenRepo = new RedisTokenRequestRepository();
+        } else {
+            LOG.info("using InMemory token request repository");
+            tokenRepo = new InMemoryTokenRequestRepository();
+        }
         random = new SecureRandom();
     }
 
@@ -62,22 +69,22 @@ public class TokenManager {
     public boolean verify(String phone, String token) {
         TokenRequest tr = tokenRepo.retrieve(phone);
         if (tr == null) {
-            logger.error("Phone number not found");
+            LOG.error("Phone number not found");
             return false;
         }
 
         if (tr.isExpired()) {
             // Expired, but not yet cleaned out by periodicCleanup()
-            logger.error("Token expired");
+            LOG.error("Token expired");
             return false;
         }
         if (!isEqualsConstantTime(tr.token.toCharArray(), token.toCharArray())) {
             tr.tries++;
-            logger.error("Token is wrong");
+            LOG.error("Token is wrong");
             return false;
         }
         if (tr.tries > 3) {
-            logger.error("Token was tried to validate too often");
+            LOG.error("Token was tried to validate too often");
             // User may try at most 3 times, it shouldn't be that hard.
             // TODO: report this error back to the user.
             return false;

@@ -5,7 +5,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import foundation.privacybydesign.sms.ratelimit.InvalidPhoneNumberException;
 import foundation.privacybydesign.sms.ratelimit.RateLimit;
-import foundation.privacybydesign.sms.ratelimit.RedisRateLimit;
+import foundation.privacybydesign.sms.ratelimit.RateLimitUtils;
 import foundation.privacybydesign.sms.smssender.CMGatewaySender;
 import foundation.privacybydesign.sms.smssender.SSHTunnelRESTSender;
 import foundation.privacybydesign.sms.smssender.Sender;
@@ -59,7 +59,7 @@ public class SMSRestApi {
     };
 
     public SMSRestApi() {
-        rateLimiter = RedisRateLimit.getInstance();
+        rateLimiter = RateLimitUtils.getRateLimiter();
     }
 
     public static String canonicalPhoneNumber(String phone)

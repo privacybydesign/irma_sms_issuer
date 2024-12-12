@@ -73,6 +73,8 @@ public abstract class RateLimit {
         }
     }
 
+    public abstract void periodicCleanup();
+
     protected abstract long nextTryIP(String ip, long now);
 
     protected abstract long nextTryPhone(String phone, long now);

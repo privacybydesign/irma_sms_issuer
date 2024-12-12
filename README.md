@@ -41,6 +41,7 @@ For Redis the following environment variables need to be set:
 | REDIS_USERNAME | Username for the Redis user |
 | REDIS_PASSWORD | The password for the Redis user |
 | REDIS_KEY_PREFIX | The prefix to use for all redis keys |
+| STORAGE_TYPE | The type of storage used: if you want to enable Redis, set it to "redis" |
 
 
 ### Run

@@ -138,6 +138,7 @@ public class MemoryRateLimit extends RateLimit {
         limit.timestamp = now;
     }
 
+    @Override
     public void periodicCleanup() {
         long now = System.currentTimeMillis();
         // Use enhanced for loop, because an iterator makes sure concurrency issues
