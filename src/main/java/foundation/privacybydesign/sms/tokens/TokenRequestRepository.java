@@ -7,6 +7,12 @@ package foundation.privacybydesign.sms.tokens;
 public interface TokenRequestRepository {
     void store(String phone, TokenRequest request);
 
+
+    /**
+     * Retrieve the token request corresponding to the provided phone number.
+     * Should return null when there's no request found.
+     * @return
+     */
     TokenRequest retrieve(String phone);
 
     void remove(String phone);
