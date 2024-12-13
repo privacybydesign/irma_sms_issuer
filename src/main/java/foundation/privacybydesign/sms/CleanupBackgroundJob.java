@@ -1,6 +1,7 @@
 package foundation.privacybydesign.sms;
 
 import foundation.privacybydesign.sms.ratelimit.RateLimitUtils;
+import foundation.privacybydesign.sms.tokens.TokenManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

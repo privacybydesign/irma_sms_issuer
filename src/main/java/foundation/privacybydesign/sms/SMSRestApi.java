@@ -10,6 +10,8 @@ import foundation.privacybydesign.sms.smssender.CMGatewaySender;
 import foundation.privacybydesign.sms.smssender.SSHTunnelRESTSender;
 import foundation.privacybydesign.sms.smssender.Sender;
 import foundation.privacybydesign.sms.smssender.SimpleRESTSender;
+import foundation.privacybydesign.sms.tokens.TokenManager;
+
 import org.irmacard.api.common.ApiClient;
 import org.irmacard.api.common.CredentialRequest;
 import org.irmacard.api.common.issuing.IdentityProviderRequest;
