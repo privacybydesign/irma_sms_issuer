@@ -94,12 +94,7 @@ public class RedisRateLimit extends RateLimit {
                 limitToRedis(jedis, key, limit);
             }
         }
-        //
-        // Limit limit = phoneLimits.get(phone);
-        // if (limit == null) {
-        // limit = new Limit(now);
-        // phoneLimits.put(phone, limit);
-        // }
+
         long nextTry; // timestamp when the next request is allowed
         switch (limit.tries) {
             case 0: // try 1: always succeeds
