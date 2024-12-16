@@ -1,12 +1,10 @@
-package foundation.privacybydesign.sms;
+package foundation.privacybydesign.sms.tokens;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Generate and verify tokens sent in the SMS message.
@@ -14,15 +12,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TokenManager {
     static private TokenManager instance;
-    private static final Logger logger = LoggerFactory.getLogger(TokenManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TokenManager.class);
 
-    // Map to store sent tokens.
-    // Format: {"phone": TokenRequest}
-    private final Map<String, TokenRequest> tokenMap;
+    private final TokenRequestRepository tokenRepo;
     private final SecureRandom random;
 
     public TokenManager() {
-        tokenMap = new ConcurrentHashMap<>();
+        final String storageType = System.getenv("STORAGE_TYPE");
+        if (storageType.equals("redis")) {
+            LOG.info("using Redis token request repository");
+            tokenRepo = new RedisTokenRequestRepository();
+        } else {
+            LOG.info("using InMemory token request repository");
+            tokenRepo = new InMemoryTokenRequestRepository();
+        }
         random = new SecureRandom();
     }
 
@@ -49,34 +52,34 @@ public class TokenManager {
         token = token.replace('O', 'X');
         token = token.replace('1', 'Y');
         token = token.replace('I', 'Z');
-        tokenMap.put(phone, new TokenRequest(token));
+        tokenRepo.store(phone, new TokenRequest(token));
         return token;
     }
 
     public boolean verify(String phone, String token) {
-        TokenRequest tr = tokenMap.get(phone);
+        TokenRequest tr = tokenRepo.retrieve(phone);
         if (tr == null) {
-            logger.error("Phone number not found");
+            LOG.error("Phone number not found");
             return false;
         }
 
         if (tr.isExpired()) {
             // Expired, but not yet cleaned out by periodicCleanup()
-            logger.error("Token expired");
+            LOG.error("Token expired");
             return false;
         }
         if (!isEqualsConstantTime(tr.token.toCharArray(), token.toCharArray())) {
             tr.tries++;
-            logger.error("Token is wrong");
+            LOG.error("Token is wrong");
             return false;
         }
         if (tr.tries > 3) {
-            logger.error("Token was tried to validate too often");
+            LOG.error("Token was tried to validate too often");
             // User may try at most 3 times, it shouldn't be that hard.
             // TODO: report this error back to the user.
             return false;
         }
-        tokenMap.remove(phone);
+        tokenRepo.remove(phone);
         return true;
     }
 
@@ -95,29 +98,9 @@ public class TokenManager {
         return result == 0;
     }
 
-    void periodicCleanup() {
-        // Use enhanced for loop, because an iterator makes sure concurrency issues cannot occur.
-        for (Map.Entry<String, TokenRequest> entry : tokenMap.entrySet()) {
-            if (entry.getValue().isExpired()) {
-                tokenMap.remove(entry.getKey());
-            }
-        }
+    public void periodicCleanup() {
+        tokenRepo.removeExpired();
     }
 }
 
-class TokenRequest {
-    String token;
-    int tries;
-    private long created;
 
-    TokenRequest(String token) {
-        this.token = token;
-        created = System.currentTimeMillis();
-        tries = 0;
-    }
-
-    boolean isExpired() {
-        return System.currentTimeMillis() - this.created >
-                SMSConfiguration.getInstance().getSMSTokenValidity()*1000;
-    }
-}

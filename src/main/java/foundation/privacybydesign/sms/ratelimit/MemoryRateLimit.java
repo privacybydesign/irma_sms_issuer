@@ -24,7 +24,7 @@ public class MemoryRateLimit extends RateLimit {
     private static final long HOUR = MINUTE * 60;
     private static final long DAY = HOUR * 24;
     private static final int IP_TIMEOUT = 10 * 1000; // timeout in seconds
-    private static final int IP_TRIES = 3;           // number of tries on first visit
+    private static final int IP_TRIES = 3; // number of tries on first visit
 
     private static MemoryRateLimit instance;
 
@@ -44,7 +44,7 @@ public class MemoryRateLimit extends RateLimit {
     }
 
     private long startLimitIP(long now) {
-        return now - IP_TIMEOUT*IP_TRIES;
+        return now - IP_TIMEOUT * IP_TRIES;
     }
 
     @Override
@@ -83,11 +83,11 @@ public class MemoryRateLimit extends RateLimit {
     @Override
     protected synchronized long nextTryPhone(String phone, long now) {
         // Rate limiter durations (sort-of logarithmic):
-        // 1   10 second
-        // 2   5 minute
-        // 3   1 hour
-        // 4   24 hour
-        // 5+  1 per day
+        // 1 10 second
+        // 2 5 minute
+        // 3 1 hour
+        // 4 24 hour
+        // 5+ 1 per day
         // Keep log 5 days for proper limiting.
 
         Limit limit = phoneLimits.get(phone);
@@ -127,27 +127,29 @@ public class MemoryRateLimit extends RateLimit {
         if (nextTry > now) {
             throw new IllegalStateException("counting rate limit while over the limit");
         }
-        limit.tries = Math.min(limit.tries+1, 5); // add 1, max at 5
+        limit.tries = Math.min(limit.tries + 1, 5); // add 1, max at 5
         // If the last usage was e.g. ≥2 days ago, we should allow them 2 tries
         // extra tries this day.
-        long lastTryDaysAgo = (now-limit.timestamp)/DAY;
+        long lastTryDaysAgo = (now - limit.timestamp) / DAY;
         long bonusTries = limit.tries - lastTryDaysAgo;
         if (bonusTries >= 1) {
-            limit.tries = (int)bonusTries;
+            limit.tries = (int) bonusTries;
         }
         limit.timestamp = now;
     }
 
+    @Override
     public void periodicCleanup() {
         long now = System.currentTimeMillis();
-        // Use enhanced for loop, because an iterator makes sure concurrency issues cannot occur.
+        // Use enhanced for loop, because an iterator makes sure concurrency issues
+        // cannot occur.
         for (Map.Entry<String, Long> entry : ipLimits.entrySet()) {
             if (entry.getValue() < startLimitIP(now)) {
                 ipLimits.remove(entry.getKey());
             }
         }
         for (Map.Entry<String, Limit> entry : phoneLimits.entrySet()) {
-            if (entry.getValue().timestamp < now - 5*DAY) {
+            if (entry.getValue().timestamp < now - 5 * DAY) {
                 phoneLimits.remove(entry.getKey());
             }
         }
@@ -161,5 +163,10 @@ class Limit {
     Limit(long now) {
         tries = 0;
         timestamp = now;
+    }
+
+    Limit(long timestamp, int tries) {
+        this.timestamp = timestamp;
+        this.tries = tries;
     }
 }

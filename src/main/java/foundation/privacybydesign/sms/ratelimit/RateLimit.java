@@ -13,9 +13,11 @@ import java.net.UnknownHostException;
 public abstract class RateLimit {
     private static Logger logger = LoggerFactory.getLogger(RateLimit.class);
 
-    /** Take an IP address and a phone number and rate limit them.
+    /**
+     * Take an IP address and a phone number and rate limit them.
+     * 
      * @param remoteAddr IP address (IPv4 or IPv6 in any format)
-     * @param phone phone number
+     * @param phone      phone number
      * @return the number of milliseconds that the client should wait - 0 if
      *         it shouldn't wait.
      */
@@ -36,10 +38,11 @@ public abstract class RateLimit {
         return 0;
     }
 
-    /** Insert an IP address (IPv4 or IPv6) and get a canonicalized version.
-     *  For IPv6, also truncate to /56 (recommended residential block).
+    /**
+     * Insert an IP address (IPv4 or IPv6) and get a canonicalized version.
+     * For IPv6, also truncate to /56 (recommended residential block).
      *
-     *  This is a public method to ease testing.
+     * This is a public method to ease testing.
      */
     public static String getAddressPrefix(String remoteAddr) {
         byte[] rawAddr;
@@ -55,7 +58,7 @@ public abstract class RateLimit {
             // take the whole IP address
         } else if (rawAddr.length == 16) { // IPv6
             // Use only the first /56 bytes, set the rest to 0.
-            for (int i=7; i<16; i++) {
+            for (int i = 7; i < 16; i++) {
                 rawAddr[i] = 0;
             }
         } else {
@@ -70,8 +73,13 @@ public abstract class RateLimit {
         }
     }
 
+    public abstract void periodicCleanup();
+
     protected abstract long nextTryIP(String ip, long now);
+
     protected abstract long nextTryPhone(String phone, long now);
+
     protected abstract void countIP(String ip, long now);
+
     protected abstract void countPhone(String phone, long now);
 }
