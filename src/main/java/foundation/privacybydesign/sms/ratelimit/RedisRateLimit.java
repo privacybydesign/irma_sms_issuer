@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import foundation.privacybydesign.sms.redis.Redis;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
+import redis.clients.jedis.Response;
+import redis.clients.jedis.Transaction;
 import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.resps.ScanResult;
 
@@ -141,6 +143,10 @@ public class RedisRateLimit extends RateLimit {
             final String key = Redis.createKey(phoneLimitsNamespace, phone);
             Limit limit = limitFromRedis(jedis, key);
 
+            if (limit == null) {
+                throw new IllegalStateException("limit not found in redis");
+            }
+
             if (nextTry > now) {
                 throw new IllegalStateException("counting rate limit while over the limit");
             }
@@ -171,19 +177,57 @@ public class RedisRateLimit extends RateLimit {
      * @return null if limit was not found
      */
     static Limit limitFromRedis(Jedis jedis, String key) {
-        final String ts = jedis.hget(key, "timestamp");
-        final String tries = jedis.hget(key, "tries");
+        // doing a redis transaction because there's multiple values to be set
+        // and setting them atomically ensures no race condition can occur
+        jedis.watch(key);
+        Transaction transaction = jedis.multi();
+
+        final Response<String> tsResult = transaction.hget(key, "timestamp");
+        final Response<String> triesResponse = transaction.hget(key, "tries");
+
+        final List<Object> transactionResult = transaction.exec();
+
+        if (transactionResult == null) {
+            LOG.error("failed to get limit from redis: exec result == null");
+            return null;
+        }
+
+        for (var r : transactionResult) {
+            if (r instanceof Exception) {
+                LOG.error("an error occurred while getting limit from redis: " + ((Exception) r).getMessage());
+                return null;
+            }
+        }
+
+        final String ts = tsResult.get();
+        final String tries = triesResponse.get();
 
         try {
             return new Limit(Long.parseLong(ts), Integer.parseInt(tries));
         } catch (NumberFormatException e) {
+            LOG.error("failed to parse string to int: " + e.getMessage());
             return null;
         }
     }
 
     static void limitToRedis(Jedis jedis, String key, Limit limit) {
-        jedis.hset(key, "timestamp", Long.toString(limit.timestamp));
-        jedis.hset(key, "tries", Integer.toString(limit.tries));
+        jedis.watch(key);
+        Transaction transaction = jedis.multi();
+
+        transaction.hset(key, "timestamp", Long.toString(limit.timestamp));
+        transaction.hset(key, "tries", Integer.toString(limit.tries));
+
+        final List<Object> results = transaction.exec();
+        if (results == null) {
+            LOG.error("failed to put limit to redis: exec result == null");
+            return;
+        }
+
+        for (var r : results) {
+            if (r instanceof Exception) {
+                LOG.error("an error occurred while setting limit to redis: " + ((Exception) r).getMessage());
+            }
+        }
     }
 
     private void cleanUpIpLimits() {
