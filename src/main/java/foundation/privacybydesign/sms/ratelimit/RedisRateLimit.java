@@ -24,8 +24,10 @@ public class RedisRateLimit extends RateLimit {
     private static Logger LOG = LoggerFactory.getLogger(RedisRateLimit.class);
     private static RedisRateLimit instance;
 
-    final String ipLimitsNamespace = "ip-limits";
-    final String phoneLimitsNamespace = "phone-limits:";
+    private static final String ipLimitsNamespace = "ip-limits";
+    private static final String phoneLimitsNamespace = "phone-limits:";
+    private static final String timestampFieldName = "timestamp";
+    private static final String triesFieldName = "tries";
 
     public static RateLimit getInstance() {
         if (instance == null) {
@@ -59,7 +61,7 @@ public class RedisRateLimit extends RateLimit {
             }
         }
 
-        long startLimit = startLimitIP(now);
+        final long startLimit = startLimitIP(now);
         if (limit < startLimit) {
             // First visit or previous visit was long ago.
             // Act like the last try was 3 periods ago.
@@ -122,7 +124,7 @@ public class RedisRateLimit extends RateLimit {
 
     @Override
     protected synchronized void countIP(String ip, long now) {
-        long nextTry = nextTryIP(ip, now);
+        final long nextTry = nextTryIP(ip, now);
         if (nextTry > now) {
             throw new IllegalStateException("counting rate limit while over the limit");
         }
@@ -137,7 +139,7 @@ public class RedisRateLimit extends RateLimit {
     // phone number.
     @Override
     protected synchronized void countPhone(String phone, long now) {
-        long nextTry = nextTryPhone(phone, now);
+        final long nextTry = nextTryPhone(phone, now);
 
         try (var jedis = pool.getResource()) {
             final String key = Redis.createKey(phoneLimitsNamespace, phone);
@@ -182,8 +184,8 @@ public class RedisRateLimit extends RateLimit {
         jedis.watch(key);
         Transaction transaction = jedis.multi();
 
-        final Response<String> tsResult = transaction.hget(key, "timestamp");
-        final Response<String> triesResponse = transaction.hget(key, "tries");
+        final Response<String> tsResult = transaction.hget(key, timestampFieldName);
+        final Response<String> triesResponse = transaction.hget(key, triesFieldName);
 
         final List<Object> transactionResult = transaction.exec();
 
@@ -214,8 +216,8 @@ public class RedisRateLimit extends RateLimit {
         jedis.watch(key);
         Transaction transaction = jedis.multi();
 
-        transaction.hset(key, "timestamp", Long.toString(limit.timestamp));
-        transaction.hset(key, "tries", Integer.toString(limit.tries));
+        transaction.hset(key, timestampFieldName, Long.toString(limit.timestamp));
+        transaction.hset(key, triesFieldName, Integer.toString(limit.tries));
 
         final List<Object> results = transaction.exec();
         if (results == null) {
@@ -230,8 +232,10 @@ public class RedisRateLimit extends RateLimit {
         }
     }
 
+    // TODO: This is not the idiomatic way to delete expired items in Redis,
+    // use the built in `expire` command instead
     private void cleanUpIpLimits() {
-        long now = System.currentTimeMillis();
+        final long now = System.currentTimeMillis();
 
         final String pattern = Redis.createNamespace(ipLimitsNamespace) + "*";
         ScanParams scanParams = new ScanParams().match(pattern);
@@ -258,8 +262,10 @@ public class RedisRateLimit extends RateLimit {
         }
     }
 
+    // TODO: This is not the idiomatic way to delete expired items in Redis,
+    // use the built in `expire` command instead
     private void cleanUpPhoneLimits() {
-        long now = System.currentTimeMillis();
+        final long now = System.currentTimeMillis();
 
         final String pattern = Redis.createNamespace(phoneLimitsNamespace) + "*";
         ScanParams scanParams = new ScanParams().match(pattern);
@@ -280,5 +286,4 @@ public class RedisRateLimit extends RateLimit {
             } while (!cursor.equals("0")); // continue until the cursor wraps around
         }
     }
-
 }

@@ -20,7 +20,11 @@ import redis.clients.jedis.resps.ScanResult;
  */
 class RedisTokenRequestRepository implements TokenRequestRepository {
     private static Logger LOG = LoggerFactory.getLogger(RedisTokenRequestRepository.class);
-    private static String namespace = "request";
+    private static final String namespace = "request";
+    private static final String tokenFieldName = "token";
+    private static final String triesFieldName = "tries";
+    private static final String createdFieldName = "tries";
+
     JedisSentinelPool pool;
 
     RedisTokenRequestRepository() {
@@ -34,9 +38,9 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
             jedis.watch(key);
 
             Transaction transaction = jedis.multi();
-            transaction.hset(key, "token", request.token);
-            transaction.hset(key, "tries", Integer.toString(request.tries));
-            transaction.hset(key, "created", String.valueOf(request.created));
+            transaction.hset(key, tokenFieldName, request.token);
+            transaction.hset(key, triesFieldName, Integer.toString(request.tries));
+            transaction.hset(key, createdFieldName, String.valueOf(request.created));
 
             final List<Object> result = transaction.exec();
 
@@ -61,6 +65,8 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
         }
     }
 
+    // TODO: This is not the idiomatic way to delete expired items in Redis,
+    // use the built in `expire` command instead
     @Override
     public void removeExpired() {
         final String pattern = Redis.createNamespace(namespace) + "*";
@@ -81,10 +87,10 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     }
 
     private void removeIfExpired(Jedis jedis, String key) {
-        String createdStr = jedis.hget(key, "created");
+        final String createdStr = jedis.hget(key, createdFieldName);
         if (createdStr != null) {
             try {
-                long created = Long.parseLong(createdStr);
+                final long created = Long.parseLong(createdStr);
                 if (TokenRequest.isExpiredForCreationDate(created)) {
                     jedis.del(key);
                 }
@@ -103,9 +109,9 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
                 jedis.watch(key);
                 Transaction transaction = jedis.multi();
 
-                final Response<String> tokenRes = transaction.hget(key, "token");
-                final Response<String> triesRes = transaction.hget(key, "tries");
-                final Response<String> createdRes = transaction.hget(key, "created");
+                final Response<String> tokenRes = transaction.hget(key, tokenFieldName);
+                final Response<String> triesRes = transaction.hget(key, triesFieldName);
+                final Response<String> createdRes = transaction.hget(key, createdFieldName);
 
                 final List<Object> execRes = transaction.exec();
 
