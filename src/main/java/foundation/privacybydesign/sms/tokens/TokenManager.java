@@ -14,8 +14,6 @@ public class TokenManager {
     static private TokenManager instance;
     private static final Logger LOG = LoggerFactory.getLogger(TokenManager.class);
 
-    // Map to store sent tokens.
-    // Format: {"phone": TokenRequest}
     private final TokenRequestRepository tokenRepo;
     private final SecureRandom random;
 
