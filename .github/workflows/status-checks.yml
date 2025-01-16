@@ -35,7 +35,7 @@ jobs:
           working-directory: webapp
           run: ./build.sh ${{ matrix.lang }}
 
-        - uses: actions/upload-artifact@v3
+        - uses: actions/upload-artifact@v4
           with:
             name: webapp-${{ matrix.lang }}
             path: webapp/build/
