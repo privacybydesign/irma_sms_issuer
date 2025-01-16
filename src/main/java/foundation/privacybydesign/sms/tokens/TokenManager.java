@@ -36,7 +36,7 @@ public class TokenManager {
         return instance;
     }
 
-    public String generate(String phone) {
+    public String generate(String phone) throws Exception {
         // https://stackoverflow.com/a/41156/559350
         // There are 30 bits. Using 32 possible values per char means
         // every char consumes exactly 5 bits, thus a token is 6 bytes.
@@ -56,7 +56,7 @@ public class TokenManager {
         return token;
     }
 
-    public boolean verify(String phone, String token) {
+    public boolean verify(String phone, String token) throws Exception {
         TokenRequest tr = tokenRepo.retrieve(phone);
         if (tr == null) {
             LOG.error("Phone number not found");

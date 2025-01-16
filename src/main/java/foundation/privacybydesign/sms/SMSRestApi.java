@@ -43,6 +43,7 @@ public class SMSRestApi {
     private static final String ERR_CANNOT_VALIDATE = "error:cannot-validate-token";
     private static final String ERR_RATE_LIMITED = "error:ratelimit";
     private static final String ERR_SENDING_SMS = "error:sending-sms";
+    private static final String ERR_GENERATING_TOKEN = "error:generating-token";
     private static final String OK_RESPONSE = "OK:"; // prefix for number
 
     private static final String PROXY_IP_HEADER = "X-Real-IP";
@@ -118,7 +119,14 @@ public class SMSRestApi {
                     .entity(ERR_ADDRESS_MALFORMED).build();
         }
 
-        String token = TokenManager.getInstance().generate(phone);
+        String token;
+        try {
+            token = TokenManager.getInstance().generate(phone);
+        } catch (Exception e) {
+            logger.error("Failed to send SMS: " + e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(ERR_GENERATING_TOKEN).build();
+        }
 
         Sender sender;
         switch (SMSConfiguration.getInstance().getSMSSenderBackend()) {
@@ -164,9 +172,15 @@ public class SMSRestApi {
                     .entity(ERR_ADDRESS_MALFORMED).build();
         }
 
-        if (!TokenManager.getInstance().verify(phone, token)) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity(ERR_CANNOT_VALIDATE).build();
+        try {
+            final boolean isValidToken = TokenManager.getInstance().verify(phone, token);
+            if (!isValidToken) {
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity(ERR_CANNOT_VALIDATE).build();
+            }
+        } catch(Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity(ERR_CANNOT_VALIDATE).build();
         }
         // The phone number is validated. Now build the issuing JWT.
 

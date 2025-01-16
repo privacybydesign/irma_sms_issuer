@@ -1,5 +1,9 @@
 package foundation.privacybydesign.sms.tokens;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +35,9 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     }
 
     @Override
-    public void store(String phone, TokenRequest request) {
-        final String key = Redis.createKey(namespace, phone);
+    public void store(String phone, TokenRequest request) throws NoSuchAlgorithmException {
+        final String phoneHash = CreateHash(phone);
+        final String key = Redis.createKey(namespace, phoneHash);
         try (var jedis = pool.getResource()) {
             jedis.watch(key);
 
@@ -56,8 +61,9 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     }
 
     @Override
-    public void remove(String phone) {
-        final String key = Redis.createKey(namespace, phone);
+    public void remove(String phone) throws NoSuchAlgorithmException {
+        final String phoneHash = CreateHash(phone);
+        final String key = Redis.createKey(namespace, phoneHash);
 
         try (var jedis = pool.getResource()) {
             jedis.del(key);
@@ -100,9 +106,10 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     }
 
     @Override
-    public TokenRequest retrieve(String phone) {
+    public TokenRequest retrieve(String phone) throws NoSuchAlgorithmException {
+        final String phoneHash = CreateHash(phone);
+        final String key = Redis.createKey(namespace, phoneHash);
         try (var jedis = pool.getResource()) {
-            final String key = Redis.createKey(namespace, phone);
             try {
                 final Map<String, String> fields = jedis.hgetAll(key);
 
@@ -116,5 +123,11 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
                 return null;
             }
         }
+    }
+
+    private static String CreateHash(String input) throws NoSuchAlgorithmException {
+        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        final byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(encodedhash);
     }
 }
