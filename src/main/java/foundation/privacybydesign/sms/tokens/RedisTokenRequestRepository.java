@@ -1,7 +1,7 @@
 package foundation.privacybydesign.sms.tokens;
 
-import java.awt.Panel;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import foundation.privacybydesign.sms.redis.Redis;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
-import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.resps.ScanResult;
@@ -23,7 +22,7 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     private static final String namespace = "request";
     private static final String tokenFieldName = "token";
     private static final String triesFieldName = "tries";
-    private static final String createdFieldName = "tries";
+    private static final String createdFieldName = "created";
 
     JedisSentinelPool pool;
 
@@ -105,31 +104,11 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
         try (var jedis = pool.getResource()) {
             final String key = Redis.createKey(namespace, phone);
             try {
+                final Map<String, String> fields = jedis.hgetAll(key);
 
-                jedis.watch(key);
-                Transaction transaction = jedis.multi();
-
-                final Response<String> tokenRes = transaction.hget(key, tokenFieldName);
-                final Response<String> triesRes = transaction.hget(key, triesFieldName);
-                final Response<String> createdRes = transaction.hget(key, createdFieldName);
-
-                final List<Object> execRes = transaction.exec();
-
-                if (execRes == null) {
-                    LOG.error("error while getting token request from redis: exec result is null");
-                    return null;
-                }
-
-                for (var r : execRes) {
-                    if (r instanceof Exception) {
-                        LOG.error("error while getting token request from redis: " + ((Exception) r).getMessage());
-                        return null;
-                    }
-                }
-
-                final String token = tokenRes.get();
-                final int tries = Integer.parseInt(triesRes.get());
-                final long created = Long.parseLong(createdRes.get());
+                final String token = fields.get(tokenFieldName);
+                final int tries = Integer.parseInt(fields.get(triesFieldName));
+                final long created = Long.parseLong(fields.get(createdFieldName));
 
                 return new TokenRequest(token, tries, created);
             } catch (NumberFormatException e) {
