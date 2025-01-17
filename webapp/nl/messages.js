@@ -24,4 +24,5 @@ var MESSAGES = {
     'error:ratelimit': 'Probeer het opnieuw over %time%.',
     'error:cannot-validate-token': 'De code kon niet worden geverifieerd. Zit er geen typfout in?',
     'error:address-malformed': 'Het ingevoerde telefoonnummer wordt niet ondersteund. Je kan alleen mobiele telefoonnummers toevoegen.',
+    'error:generating-token': 'Er kon geen verificatiecode worden gegenereerd. Neem contact op met Yivi als dit vaker voorkomt.',
 };
