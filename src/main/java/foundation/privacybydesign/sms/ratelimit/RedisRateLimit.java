@@ -43,8 +43,8 @@ public class RedisRateLimit extends RateLimit {
     }
 
     @Override
-    protected long nextTryIP(String ip, long now) {
-        final String key = Redis.createKey(ipLimitsNamespace, ip);
+    protected long nextTryIP(String ipHash, long now) {
+        final String key = Redis.createKey(ipLimitsNamespace, ipHash);
 
         // Allow at most 1 try in each period (TIMEOUT), but kick in only
         // after 3 tries. Thus while the user can do only 1 try per period
@@ -78,7 +78,7 @@ public class RedisRateLimit extends RateLimit {
     }
 
     @Override
-    protected synchronized long nextTryPhone(String phone, long now) {
+    protected synchronized long nextTryPhone(String phoneHash, long now) {
         // Rate limiter durations (sort-of logarithmic):
         // 1 10 second
         // 2 5 minute
@@ -87,7 +87,7 @@ public class RedisRateLimit extends RateLimit {
         // 5+ 1 per day
         // Keep log 5 days for proper limiting.
 
-        final String key = Redis.createKey(phoneLimitsNamespace, phone);
+        final String key = Redis.createKey(phoneLimitsNamespace, phoneHash);
 
         Limit limit;
 
@@ -123,13 +123,13 @@ public class RedisRateLimit extends RateLimit {
     }
 
     @Override
-    protected synchronized void countIP(String ip, long now) {
-        final long nextTry = nextTryIP(ip, now);
+    protected synchronized void countIP(String ipHash, long now) {
+        final long nextTry = nextTryIP(ipHash, now);
         if (nextTry > now) {
             throw new IllegalStateException("counting rate limit while over the limit");
         }
 
-        final String key = Redis.createKey(ipLimitsNamespace, ip);
+        final String key = Redis.createKey(ipLimitsNamespace, ipHash);
         try (var jedis = pool.getResource()) {
             jedis.set(key, Long.toString(nextTry));
         }
@@ -138,11 +138,11 @@ public class RedisRateLimit extends RateLimit {
     // Count the usage of this rate limit - adding to the budget for this
     // phone number.
     @Override
-    protected synchronized void countPhone(String phone, long now) {
-        final long nextTry = nextTryPhone(phone, now);
+    protected synchronized void countPhone(String phoneHash, long now) {
+        final long nextTry = nextTryPhone(phoneHash, now);
 
         try (var jedis = pool.getResource()) {
-            final String key = Redis.createKey(phoneLimitsNamespace, phone);
+            final String key = Redis.createKey(phoneLimitsNamespace, phoneHash);
             Limit limit = limitFromRedis(jedis, key);
 
             if (limit == null) {

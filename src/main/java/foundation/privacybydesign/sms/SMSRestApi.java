@@ -30,6 +30,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -117,6 +118,9 @@ public class SMSRestApi {
         } catch (InvalidPhoneNumberException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(ERR_ADDRESS_MALFORMED).build();
+        } catch (NoSuchAlgorithmException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(ERR_GENERATING_TOKEN).build();
         }
 
         String token;

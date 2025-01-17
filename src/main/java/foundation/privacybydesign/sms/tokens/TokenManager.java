@@ -3,7 +3,10 @@ package foundation.privacybydesign.sms.tokens;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import foundation.privacybydesign.sms.common.Sha256Hasher;
+
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
@@ -37,6 +40,8 @@ public class TokenManager {
     }
 
     public String generate(String phone) throws Exception {
+        final String phoneHash = Sha256Hasher.CreateHash(phone);
+        
         // https://stackoverflow.com/a/41156/559350
         // There are 30 bits. Using 32 possible values per char means
         // every char consumes exactly 5 bits, thus a token is 6 bytes.
@@ -52,12 +57,13 @@ public class TokenManager {
         token = token.replace('O', 'X');
         token = token.replace('1', 'Y');
         token = token.replace('I', 'Z');
-        tokenRepo.store(phone, new TokenRequest(token));
+        tokenRepo.store(phoneHash, new TokenRequest(token));
         return token;
     }
 
-    public boolean verify(String phone, String token) throws Exception {
-        TokenRequest tr = tokenRepo.retrieve(phone);
+    public boolean verify(String phone, String token) throws NoSuchAlgorithmException {
+        final String phoneHash = Sha256Hasher.CreateHash(phone);
+        TokenRequest tr = tokenRepo.retrieve(phoneHash);
         if (tr == null) {
             LOG.error("Phone number not found");
             return false;
@@ -79,7 +85,7 @@ public class TokenManager {
             // TODO: report this error back to the user.
             return false;
         }
-        tokenRepo.remove(phone);
+        tokenRepo.remove(phoneHash);
         return true;
     }
 
@@ -102,5 +108,3 @@ public class TokenManager {
         tokenRepo.removeExpired();
     }
 }
-
-

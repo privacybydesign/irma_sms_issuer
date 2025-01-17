@@ -71,17 +71,17 @@ public class MemoryRateLimit extends RateLimit {
     }
 
     @Override
-    protected synchronized void countIP(String ip, long now) {
-        long nextTry = nextTryIP(ip, now);
+    protected synchronized void countIP(String ipHash, long now) {
+        long nextTry = nextTryIP(ipHash, now);
         if (nextTry > now) {
             throw new IllegalStateException("counting rate limit while over the limit");
         }
-        ipLimits.put(ip, nextTry);
+        ipLimits.put(ipHash, nextTry);
     }
 
     // Is the user over the rate limit per phone number?
     @Override
-    protected synchronized long nextTryPhone(String phone, long now) {
+    protected synchronized long nextTryPhone(String phoneHash, long now) {
         // Rate limiter durations (sort-of logarithmic):
         // 1 10 second
         // 2 5 minute
@@ -90,10 +90,10 @@ public class MemoryRateLimit extends RateLimit {
         // 5+ 1 per day
         // Keep log 5 days for proper limiting.
 
-        Limit limit = phoneLimits.get(phone);
+        Limit limit = phoneLimits.get(phoneHash);
         if (limit == null) {
             limit = new Limit(now);
-            phoneLimits.put(phone, limit);
+            phoneLimits.put(phoneHash, limit);
         }
         long nextTry; // timestamp when the next request is allowed
         switch (limit.tries) {
@@ -121,9 +121,9 @@ public class MemoryRateLimit extends RateLimit {
     // Count the usage of this rate limit - adding to the budget for this
     // phone number.
     @Override
-    protected synchronized void countPhone(String phone, long now) {
-        long nextTry = nextTryPhone(phone, now);
-        Limit limit = phoneLimits.get(phone);
+    protected synchronized void countPhone(String phoneHash, long now) {
+        long nextTry = nextTryPhone(phoneHash, now);
+        Limit limit = phoneLimits.get(phoneHash);
         if (nextTry > now) {
             throw new IllegalStateException("counting rate limit while over the limit");
         }

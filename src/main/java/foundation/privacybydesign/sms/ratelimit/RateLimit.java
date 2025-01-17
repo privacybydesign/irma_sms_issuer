@@ -3,8 +3,11 @@ package foundation.privacybydesign.sms.ratelimit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import foundation.privacybydesign.sms.common.Sha256Hasher;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Base class for rate limiting. Subclasses provide storage methods (memory
@@ -20,21 +23,28 @@ public abstract class RateLimit {
      * @param phone      phone number
      * @return the number of milliseconds that the client should wait - 0 if
      *         it shouldn't wait.
+     * @throws NoSuchAlgorithmException If the hashing algorithm in use isn't available on the system, this exception is thrown.
      */
     public long rateLimited(String remoteAddr, String phone)
-            throws InvalidPhoneNumberException {
-        String addr = getAddressPrefix(remoteAddr);
+            throws InvalidPhoneNumberException, NoSuchAlgorithmException {
         long now = System.currentTimeMillis();
-        long ipRetryAfter = nextTryIP(addr, now);
-        long phoneRetryAfter = nextTryPhone(phone, now);
+        
+        String addr = getAddressPrefix(remoteAddr);
+
+        final String ipHash = Sha256Hasher.CreateHash(addr);
+        final String phoneHash = Sha256Hasher.CreateHash(phone);
+
+        long ipRetryAfter = nextTryIP(ipHash, now);
+        long phoneRetryAfter = nextTryPhone(phoneHash, now);
         long retryAfter = Math.max(ipRetryAfter, phoneRetryAfter);
         if (retryAfter > now) {
+            // Explicitly log the IP address, as it might be needed for investigations
             logger.warn("Denying request from {}: rate limit (ip and/or phone) exceeded", addr);
             // Don't count this request if it has been denied.
             return retryAfter - now;
         }
-        countIP(addr, now);
-        countPhone(phone, now);
+        countIP(ipHash, now);
+        countPhone(phoneHash, now);
         return 0;
     }
 
@@ -75,11 +85,11 @@ public abstract class RateLimit {
 
     public abstract void periodicCleanup();
 
-    protected abstract long nextTryIP(String ip, long now);
+    protected abstract long nextTryIP(String ipHash, long now);
 
-    protected abstract long nextTryPhone(String phone, long now);
+    protected abstract long nextTryPhone(String phoneHash, long now);
 
-    protected abstract void countIP(String ip, long now);
+    protected abstract void countIP(String ipHash, long now);
 
-    protected abstract void countPhone(String phone, long now);
+    protected abstract void countPhone(String phoneHash, long now);
 }

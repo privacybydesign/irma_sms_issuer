@@ -5,15 +5,15 @@ package foundation.privacybydesign.sms.tokens;
  * An interface for a repository to store tokens in.
  */
 public interface TokenRequestRepository {
-    void store(String phone, TokenRequest request) throws Exception;
+    void store(String phone, TokenRequest request);
 
     /**
      * Retrieve the token request corresponding to the provided phone number.
      * Should return null when there's no request found.
      */
-    TokenRequest retrieve(String phone) throws Exception;
+    TokenRequest retrieve(String phoneHash);
 
-    void remove(String phone) throws Exception;
+    void remove(String phone);
 
     void removeExpired();
 }
