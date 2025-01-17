@@ -24,5 +24,6 @@ var MESSAGES = {
     'error:ratelimit': 'Please try again in %time%.',
     'error:cannot-validate-token': 'The code cannot be verified. Is there a typo?',
     'error:address-malformed': 'The telephone number you entered is not supported by us. You can only add (European) mobile telephone numbers.',
+    'error:generating-token': 'We are unable to generate a token for you to verify. Please contact Yivi if this happens more often.',
 };
 

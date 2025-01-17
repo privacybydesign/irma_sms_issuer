@@ -11,7 +11,7 @@ public interface TokenRequestRepository {
      * Retrieve the token request corresponding to the provided phone number.
      * Should return null when there's no request found.
      */
-    TokenRequest retrieve(String phone);
+    TokenRequest retrieve(String phoneHash);
 
     void remove(String phone);
 

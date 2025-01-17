@@ -31,8 +31,8 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     }
 
     @Override
-    public void store(String phone, TokenRequest request) {
-        final String key = Redis.createKey(namespace, phone);
+    public void store(String phoneHash, TokenRequest request) {
+        final String key = Redis.createKey(namespace, phoneHash);
         try (var jedis = pool.getResource()) {
             jedis.watch(key);
 
@@ -56,8 +56,8 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
     }
 
     @Override
-    public void remove(String phone) {
-        final String key = Redis.createKey(namespace, phone);
+    public void remove(String phoneHash) {
+        final String key = Redis.createKey(namespace, phoneHash);
 
         try (var jedis = pool.getResource()) {
             jedis.del(key);
@@ -94,15 +94,15 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
                     jedis.del(key);
                 }
             } catch (NumberFormatException e) {
-                LOG.error("Failed to parse " + key + " creation into long: " + e.getMessage());
+                LOG.error("Failed to parse creation into long.", e);
             }
         }
     }
 
     @Override
-    public TokenRequest retrieve(String phone) {
+    public TokenRequest retrieve(String phoneHash) {
+        final String key = Redis.createKey(namespace, phoneHash);
         try (var jedis = pool.getResource()) {
-            final String key = Redis.createKey(namespace, phone);
             try {
                 final Map<String, String> fields = jedis.hgetAll(key);
 
@@ -112,7 +112,7 @@ class RedisTokenRequestRepository implements TokenRequestRepository {
 
                 return new TokenRequest(token, tries, created);
             } catch (NumberFormatException e) {
-                LOG.error("failed to parse for " + key + ": " + e.getMessage());
+                LOG.error("Failed to parse tries or created field", e);
                 return null;
             }
         }
