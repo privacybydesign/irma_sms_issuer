@@ -3,7 +3,7 @@ package foundation.privacybydesign.sms.tokens;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import foundation.privacybydesign.sms.common.Sha256Hasher;
+import foundation.privacybydesign.sms.common.Hmac;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -40,8 +40,8 @@ public class TokenManager {
         return instance;
     }
 
-    public String generate(String phone, Sha256Hasher hmac) throws Exception {
-        final String phoneHash = hmac.CreateHash(phone);
+    public String generate(String phone, Hmac hmac) throws Exception {
+        final String phoneHash = hmac.createHmac(phone);
         
         // https://stackoverflow.com/a/41156/559350
         // There are 30 bits. Using 32 possible values per char means
@@ -62,9 +62,9 @@ public class TokenManager {
         return token;
     }
 
-    public boolean verify(String phone, String token, Sha256Hasher hmac)
+    public boolean verify(String phone, String token, Hmac hmac)
             throws NoSuchAlgorithmException, InvalidKeyException {
-        final String phoneHash = hmac.CreateHash(phone);
+        final String phoneHash = hmac.createHmac(phone);
         TokenRequest tr = tokenRepo.retrieve(phoneHash);
         if (tr == null) {
             LOG.error("Phone number not found");
