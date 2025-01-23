@@ -3,10 +3,11 @@ package foundation.privacybydesign.sms.ratelimit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import foundation.privacybydesign.sms.common.Sha256Hasher;
+import foundation.privacybydesign.sms.common.Hmac;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -25,14 +26,14 @@ public abstract class RateLimit {
      *         it shouldn't wait.
      * @throws NoSuchAlgorithmException If the hashing algorithm in use isn't available on the system, this exception is thrown.
      */
-    public long rateLimited(String remoteAddr, String phone)
-            throws InvalidPhoneNumberException, NoSuchAlgorithmException {
+    public long rateLimited(String remoteAddr, String phone, Hmac hmac)
+            throws InvalidPhoneNumberException, NoSuchAlgorithmException, InvalidKeyException {
         long now = System.currentTimeMillis();
         
         String addr = getAddressPrefix(remoteAddr);
 
-        final String ipHash = Sha256Hasher.CreateHash(addr);
-        final String phoneHash = Sha256Hasher.CreateHash(phone);
+        final String ipHash = hmac.createHmac(addr);
+        final String phoneHash = hmac.createHmac(phone);
 
         long ipRetryAfter = nextTryIP(ipHash, now);
         long phoneRetryAfter = nextTryPhone(phoneHash, now);
