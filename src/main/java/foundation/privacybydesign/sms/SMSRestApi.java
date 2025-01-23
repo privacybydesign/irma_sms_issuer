@@ -29,6 +29,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -99,14 +100,14 @@ public class SMSRestApi {
     @Produces(MediaType.TEXT_PLAIN)
     public Response sendSmsCode(@Context HttpServletRequest req,
             @FormParam("phone") String phone,
-            @FormParam("language") String language) {
+            @FormParam("language") String language) throws InvalidKeyException {
         try {
             phone = canonicalPhoneNumber(phone);
 
             String ip = req.getHeader(PROXY_IP_HEADER);
             if (ip == null)
                 ip = req.getRemoteAddr();
-            long retryAfter = rateLimiter.rateLimited(ip, phone);
+            long retryAfter = rateLimiter.rateLimited(ip, phone, SMSConfiguration.getInstance().getHmac());
             if (retryAfter > 0) {
                 // 429 Too Many Requests
                 // https://tools.ietf.org/html/rfc6585#section-4
@@ -125,7 +126,7 @@ public class SMSRestApi {
 
         String token;
         try {
-            token = TokenManager.getInstance().generate(phone);
+            token = TokenManager.getInstance().generate(phone, SMSConfiguration.getInstance().getHmac());
         } catch (Exception e) {
             logger.error("Failed to send SMS: " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -177,7 +178,7 @@ public class SMSRestApi {
         }
 
         try {
-            final boolean isValidToken = TokenManager.getInstance().verify(phone, token);
+            final boolean isValidToken = TokenManager.getInstance().verify(phone, token, SMSConfiguration.getInstance().getHmac());
             if (!isValidToken) {
                 return Response.status(Response.Status.UNAUTHORIZED)
                         .entity(ERR_CANNOT_VALIDATE).build();

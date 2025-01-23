@@ -1,10 +1,12 @@
 package foundation.privacybydesign.sms;
 
 import foundation.privacybydesign.sms.common.BaseConfiguration;
+import foundation.privacybydesign.sms.common.Sha256Hasher;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.irmacard.api.common.util.GsonUtil;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Map;
 import java.security.KeyManagementException;
 import java.security.PrivateKey;
@@ -42,6 +44,13 @@ public class SMSConfiguration extends BaseConfiguration<SMSConfiguration> {
     private String sms_attribute = "";
     private CMGatewayConfiguration cm = null;
 
+    // HMAC key with which phone numbers and IP addresses are HMACed when putting them into Redis.
+    // Must be base64-encoded random data of 32 bytes.
+    // Can be generated for example as follows: `openssl rand 32 | base64`
+    private String hmac_key_base64 = "";
+
+    private Sha256Hasher hmac;
+
     public static SMSConfiguration getInstance() {
         if (instance == null) {
             load();
@@ -56,6 +65,9 @@ public class SMSConfiguration extends BaseConfiguration<SMSConfiguration> {
         } catch (IOException e) {
             instance = new SMSConfiguration();
         }
+
+        byte[] hmac_key = Base64.getDecoder().decode(instance.hmac_key_base64);
+        instance.hmac = new Sha256Hasher(hmac_key);
     }
 
     public String getSMSSenderBackend() {
@@ -144,5 +156,9 @@ public class SMSConfiguration extends BaseConfiguration<SMSConfiguration> {
 
     public PrivateKey getPrivateKey() throws KeyManagementException {
         return BaseConfiguration.getPrivateKey(private_key_path);
+    }
+
+    public Sha256Hasher getHmac() {
+        return hmac;
     }
 }
