@@ -7,6 +7,7 @@ import foundation.privacybydesign.sms.common.Sha256Hasher;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -25,14 +26,14 @@ public abstract class RateLimit {
      *         it shouldn't wait.
      * @throws NoSuchAlgorithmException If the hashing algorithm in use isn't available on the system, this exception is thrown.
      */
-    public long rateLimited(String remoteAddr, String phone)
-            throws InvalidPhoneNumberException, NoSuchAlgorithmException {
+    public long rateLimited(String remoteAddr, String phone, Sha256Hasher hmac)
+            throws InvalidPhoneNumberException, NoSuchAlgorithmException, InvalidKeyException {
         long now = System.currentTimeMillis();
         
         String addr = getAddressPrefix(remoteAddr);
 
-        final String ipHash = Sha256Hasher.CreateHash(addr);
-        final String phoneHash = Sha256Hasher.CreateHash(phone);
+        final String ipHash = hmac.CreateHash(addr);
+        final String phoneHash = hmac.CreateHash(phone);
 
         long ipRetryAfter = nextTryIP(ipHash, now);
         long phoneRetryAfter = nextTryPhone(phoneHash, now);
