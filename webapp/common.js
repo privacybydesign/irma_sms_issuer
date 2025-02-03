@@ -64,13 +64,9 @@ function setWindow(window, back) {
 
     const backButton = $('#back-button');
     backButton.off();
-    if (back) {
+    if (window == 'confirm') {
         backButton
           .click(() => {clearStatus(); setWindow(back); return false;})
-          .removeClass('button-hidden');
-    } else if (history.length >  1) {
-        backButton
-          .click(() => {clearStatus(); history.back(); return false;})
           .removeClass('button-hidden');
     } else {
         backButton.addClass('button-hidden');
