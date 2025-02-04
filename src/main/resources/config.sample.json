@@ -21,5 +21,6 @@
   "scheme_manager": "irma-demo",
   "sms_issuer": "sidn-pbdf",
   "sms_credential": "mobilenumber",
-  "sms_attribute": "mobilenumber"
+  "sms_attribute": "mobilenumber",
+  "hmac_key_base64": "<<insert output from `openssl rand 32 | base64` here>>"
 }
