@@ -1,4 +1,3 @@
-
 FROM node:20 AS webappbuild
 
 # Build the webapp
@@ -12,7 +11,7 @@ RUN ./build.sh nl && mv build /www/nl
 # Let root redirect to the english version
 RUN cp /webapp/redirect-en.html /www/index.html
 
-FROM gradle:7.6-jdk11 as javabuild
+FROM gradle:7.6-jdk11 AS javabuild
 
 # Build the java app
 COPY ./ /app/
